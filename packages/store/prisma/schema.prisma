@@ -14,6 +14,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User{
+  id        String        @id @default(uuid())
+  username  String
+  password  String
+  createdAt DateTime      @default(now())
+  website   Website[]
+}
+
 model Website {
   id        String        @id @default(uuid())
   url       String
@@ -21,6 +29,8 @@ model Website {
   ticks     WebsiteTick[]
   regionId  String
   region    Region        @relation(fields: [regionId], references: [id])
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
 }
 
 model Region {
@@ -38,6 +48,8 @@ model WebsiteTick {
   region           Region        @relation(fields: [regionId], references: [id])
   websiteId        String
   website          Website       @relation(fields: [websiteId], references: [id])
+  createdAt        DateTime      @default(now())
+
 }
 
 enum WebsiteStatus {
