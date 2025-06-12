@@ -15,34 +15,33 @@ datasource db {
 }
 
 model Website {
-  id        String @id @default(uuid())
+  id        String        @id @default(uuid())
   url       String
   timeAdded DateTime
-  ticks WebsiteTick[]
+  ticks     WebsiteTick[]
   regionId  String
-  region Region @relation(fields: [regionId], references: [id])
+  region    Region        @relation(fields: [regionId], references: [id])
 }
 
-model Region{
-  id  String @id @default(uuid())
-  name  String
-  ticks WebsiteTick[]
+model Region {
+  id      String        @id @default(uuid())
+  name    String
+  ticks   WebsiteTick[]
   website Website[]
 }
 
-model WebsiteTick{
-  id  String @id @default(uuid())
-  response_time_ms  Int
-  status WebsiteStatus
-  regionId String 
-  region    Region  @relation(fields:[regionId] , references:[id])
-  websiteId String 
-  website Website @relation(fields:[websiteId] , references:[id])
-
+model WebsiteTick {
+  id               String        @id @default(uuid())
+  response_time_ms Int
+  status           WebsiteStatus
+  regionId         String
+  region           Region        @relation(fields: [regionId], references: [id])
+  websiteId        String
+  website          Website       @relation(fields: [websiteId], references: [id])
 }
 
-enum WebsiteStatus{
-Up
-Down
-Unknown
+enum WebsiteStatus {
+  Up
+  Down
+  Unknown
 }
