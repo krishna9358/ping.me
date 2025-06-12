@@ -6,17 +6,23 @@ const websitesRouter = Router();
 websitesRouter.use(express.json());
 
 websitesRouter.get("/status/:websiteId", async (req, res) => {
-  await prismaClient.website.create({
+
+});
+
+websitesRouter.post("/website", async (req, res) => {
+  if(!req.body.url){
+    res.status(411).json({});
+  }
+  const website = await prismaClient.website.create({
     data: {
       url: req.body.url,
       timeAdded: new Date(),
       region: req.body.region,
     },
-  });
-});
 
-websitesRouter.post("/website", (req, res) => {
-  res.send("Hello World");
+  });
+
+  res.json({id: website.id})
 });
 
 export default websitesRouter;
