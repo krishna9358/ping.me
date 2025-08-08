@@ -35,7 +35,7 @@ userRouter.get("/signin", async (req, res) => {
 
       const token = jwt.sign({id : user.id}, process.env.JWT_SECRET!, { expiresIn: "1h" });
     // Send response
-    res.json({ message: "User Signed in", id: user.id, jwt:token });
+    res.status(200).json({ message: "User Signed in", id: user.id, jwt:token });
   } catch (e) {
     // Send error response
     res.status(403).send("User not found");
@@ -60,7 +60,7 @@ userRouter.post("/signup", async (req, res) => {
     });
 
     // Send response
-    res.json({ message: "User Created Successfully", id: user.id });
+    res.status(200).json({ message: "User Created Successfully", id: user.id });
   } catch (e) {
     // Send error response
     res.status(403).send("User already exists");

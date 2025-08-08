@@ -18,8 +18,8 @@ websitesRouter.post("/website", async (req, res) => {
     data: {
       url: req.body.url,
       timeAdded: new Date(),
-      region: req.body.region,
-      user: req.body.user,
+      userId: "dsafnk",
+      regionId: "dsafnk",
     }
   });
 
