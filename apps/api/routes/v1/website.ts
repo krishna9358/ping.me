@@ -1,6 +1,7 @@
 import { Router } from "express";
 import prismaClient from "store/client";
 import express from "express";
+import { AuthInput } from "./types";
 const websitesRouter = Router();
 
 websitesRouter.use(express.json());
@@ -18,8 +19,8 @@ websitesRouter.post("/website", async (req, res) => {
       url: req.body.url,
       timeAdded: new Date(),
       region: req.body.region,
-    },
-
+      user: req.body.user,
+    }
   });
 
   res.json({id: website.id})
