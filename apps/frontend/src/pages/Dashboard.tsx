@@ -25,9 +25,9 @@ export const Dashboard: React.FC = () => {
       <Header onWebsiteCreated={handleWebsiteCreated} />
 
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute top-[-20%] left-[-10%] w-[40rem] h-[40rem] bg-accent-500/20 blur-[110px] rounded-full" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[36rem] h-[36rem] bg-blue-500/20 blur-[100px] rounded-full" />
-        <div className="absolute inset-0 bg-grid-dots opacity-[0.08]" />
+        <div className="absolute top-[-20%] left-[-10%] w-[40rem] h-[40rem] bg-accent-500/25 blur-[110px] rounded-full" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[36rem] h-[36rem] bg-accent-700/25 blur-[100px] rounded-full" />
+        <div className="absolute inset-0 bg-grid-dots opacity-[0.07]" />
       </div>
 
       <main className="relative max-w-7xl mx-auto px-6 py-8">

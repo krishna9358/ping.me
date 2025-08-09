@@ -29,7 +29,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(({
         )}
         <input
           ref={ref}
-          className={`w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-400 focus:border-accent-500 focus:ring-0 transition-colors duration-200 ${
+          className={`w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-lg text-gray-100 placeholder-gray-400 focus:border-accent-500 focus:ring-accent-500/30 transition-colors duration-200 ${
             Icon && iconPosition === 'left' ? 'pl-10' : ''
           } ${
             Icon && iconPosition === 'right' ? 'pr-10' : ''

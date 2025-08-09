@@ -35,7 +35,7 @@ export const Signup: React.FC = () => {
 
   return (
     <AuthLayout>
-      <Card>
+      <Card className="">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <h2 className="text-2xl font-bold text-white text-center mb-2">Create your account</h2>
@@ -89,12 +89,12 @@ export const Signup: React.FC = () => {
 
           <div className="text-center">
             <span className="text-gray-400">Already have an account? </span>
-            <Link 
-              to="/login" 
+            <a
+              href="/login" 
               className="text-accent-400 hover:text-accent-300 font-medium transition-colors"
             >
               Sign in
-            </Link>
+            </a>
           </div>
         </form>
       </Card>
