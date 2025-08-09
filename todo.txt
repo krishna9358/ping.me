@@ -1,2 +1,4 @@
 - [ ] write tests
 - [ ] check the schema so that both the rust and typescript are in sync
+- [ ] Make the docker container for it , use k8s and use it for production
+- [ ] use rate limiters and everything we can do for production and scalling.   
