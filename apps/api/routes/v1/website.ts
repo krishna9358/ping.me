@@ -46,7 +46,7 @@ websitesRouter.post("/website", authMiddleware, async (req, res) => {
       url: req.body.url,
       timeAdded: new Date(),
       userId: req.userId!,
-      regionId: "dsafnk",
+      regionId: "INDIA"
     }
   });
 
