@@ -7,8 +7,32 @@ const websitesRouter = Router();
 
 websitesRouter.use(express.json());
 
-websitesRouter.get("/status/:websiteId",authMiddleware, async (req, res) => {
+websitesRouter.get("/status/:websiteId",authMiddleware, async (req, res) =>   {
+  // Finding the 1st website tick in descending order( the latest or recent one)
+  const website = await prismaClient.website.findFirst({
+    where:{
+      userId: req.userId!,
+      id: req.params.websiteId
+    },
+    include:{
+      ticks: {
+        orderBy: {
+          createdAt: "desc"
+        },
+        take: 1
+      }
+    }
+  })
 
+  if(!website){
+    res.status(404).send("website not found");
+    return;
+  }
+
+  res.json({
+    website
+    
+  })
 });
 
 websitesRouter.post("/website", authMiddleware, async (req, res) => {
