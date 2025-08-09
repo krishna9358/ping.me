@@ -85,8 +85,8 @@ export const Dashboard: React.FC = () => {
                   {websites.length ? Math.round(websites.reduce((acc, w) => acc + w.uptime, 0) / websites.length * 10) / 10 : 0}%
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                <div className="w-6 h-2 bg-blue-400 rounded" />
+              <div className="w-12 h-12 bg-accent-600/20 rounded-lg flex items-center justify-center">
+                <div className="w-6 h-2 bg-accent-500 rounded" />
               </div>
             </div>
           </AnimatedSection>
