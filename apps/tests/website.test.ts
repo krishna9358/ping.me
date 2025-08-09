@@ -1,29 +1,109 @@
-import { describe, expect, it } from "bun:test";
+import { describe, it, expect, beforeAll } from "bun:test";
 import axios from "axios";
-import { BASE_URL } from "./config";
-// supertest -> express
+import { createUser } from "./CreateRandomUser";
+import { BACKEND_URL } from "./config";
 
-let base_url = BASE_URL;
+describe("Website gets created", () => {
+    let token: string;
 
-describe("website gets created", () => {
-  it("Website not created if url is not presented ", () => {
-    try {
-      axios.post(`${base_url}/api/v1/websites/website`, {});
-      expect(false, "website created when it shouldn't");
-    } catch (e) {}
-  });
+    beforeAll(async () => {
+        const data = await createUser();
+        token = data.jwt;
+    })
 
-  // it.todo is going to ignore this test for now
-  it.todo("website is created if url is presented", async () => {
-    const response = await axios.post(
-      `${base_url}/api/v1/websites/website`,
-      {
-        url: "https://www.google.com",
-        region: "us",
-        user: "test",
-        password: "test", 
-      }
-    );
-    expect(response.data.id).not.toBeNull();
-  });
-});
+    it("Website not created if url is not present", async () => {
+        try {
+            await axios.post(`${BACKEND_URL}/website`, {
+                
+            }, {
+                headers: {
+                    Authorization: token
+                }
+            });
+            expect(false, "Website created when it shouldnt");
+        } catch(e) {
+
+        }
+
+    })
+
+    it("Website is created if url is present", async () => {
+        const response = await axios.post(`${BACKEND_URL}/website`, {
+            url: "https://google.com"
+        }, {
+            headers: {
+                Authorization: token
+            }
+        })
+        expect(response.data.id).not.toBeNull();
+    })
+
+
+    it("Website is not created if the header is not present", async () => {
+        try {
+            const response = await axios.post(`${BACKEND_URL}/website`, {
+                url: "https://google.com"
+            });
+            expect(false, "Website shouldnt be created if no auth header")
+        } catch(e) {
+
+        }
+    })
+})
+
+describe("Can fetch website", () => {
+    let token1: string, userId1: string;
+    let token2: string, userId2: string;
+
+    beforeAll(async () => {
+        const user1 = await createUser();
+        const user2 = await createUser();
+        token1 = user1.jwt;
+        userId1 = user1.id;
+        token2 = user2.jwt;
+        userId2 = user2.id;
+    });
+
+    it("Is able to fetch a website that the user created", async () => {
+        const websiteResponse = await axios.post(`${BACKEND_URL}/website`, {
+            url: "https://hdjjhdhdjhdj.com/"
+        }, {
+            headers: {
+                Authorization: token1
+            }
+        })
+
+        const getWebsiteResponse = await axios.get(`${BACKEND_URL}/status/${websiteResponse.data.id}`, {
+            headers: {
+                Authorization: token1
+            }
+        })
+
+        console.log(getWebsiteResponse.data)
+
+        expect(getWebsiteResponse.data.id).toBe(websiteResponse.data.id)
+        expect(getWebsiteResponse.data.user_id).toBe(userId1)
+    })
+
+    it("Cant access website created by other user", async () => {
+        const websiteResponse = await axios.post(`${BACKEND_URL}/website`, {
+            url: "https://hdjjhdhdjhdj.com/"
+        }, {
+            headers: {
+                Authorization: token1
+            }
+        })
+
+        try {
+
+            await axios.get(`${BACKEND_URL}/status/${websiteResponse.data.id}`, {
+                headers: {
+                    Authorization: token1
+                }
+            })
+            expect(false, "Should be able to access website of a diff user")
+        } catch(e) {
+
+        }
+    })
+})

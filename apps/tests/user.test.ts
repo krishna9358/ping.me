@@ -1,63 +1,61 @@
-import {describe, it, test, expect} from "bun:test";
+
 import axios from "axios";
+import {describe, expect, it, test} from "bun:test";
 import { BACKEND_URL } from "./config";
 
-const USERNAME = Math.random().toString();
+const USER_NAME = Math.random().toString();
 
-describe("User Signup Endpoints", ()=>{
-    it("Isnt able to sign up if body is incorrect", ()=>{
+describe("Signup endpoints", () => {
+    it("Isnt able to sign up if body is incorrect", async () => {
         try {
-            axios.post(`${BACKEND_URL}/user/signup`, {
-                email: "random email",
-                password : "password"
-            });
-            expect(false, "User signed up when it shouldn't");
-        } catch (error) {
-            expect(true);
+            await axios.post(`${BACKEND_URL}/user/signup`, {
+                email: USER_NAME,
+                password: "password"
+            })
+            expect(false, "Control shouldnt reach here")
+        } catch(e) {
+
         }
     })
 
-    it.todo("Is able to sign up if body is correct", async ()=>{
+    it("Is able to sign up if body is incorrect", async () => {
         try {
             const res = await axios.post(`${BACKEND_URL}/user/signup`, {
-                username: USERNAME,
-                password : "password"
-            });
-            expect(true, "User signed up when it should");
+                username: USER_NAME,
+                password: "password"
+            })
             expect(res.status).toBe(200);
-            expect(res.data.id).not.toBeUndefined();
-        } catch (error) {
-            expect(false);
+            expect(res.data.id).toBeDefined();
+        } catch(e) {
+            // console.log(e);
         }
     })
 })
 
 
-
-describe("User Signin Endpoints", ()=>{
-    it("Isnt able to sign in if body is incorrect", ()=>{
+describe("Signin endpoints", () => {
+    it("Isnt able to sign in if body is incorrect", async () => {
         try {
-            axios.post(`${BACKEND_URL}/user/signin`, {
-                email: "random email",
-                password : "password"
-            });
-            expect(false, "User signed in when it shouldn't");
-        } catch (error) {
-            expect(true);
+            await axios.post(`${BACKEND_URL}/user/signin`, {
+                email: USER_NAME,
+                password: "password"
+            })
+            expect(false, "Control shouldnt reach here")
+        } catch(e) {
+            console.log(e);
         }
     })
 
-    it.todo("Is able to sign in if body is correct", async ()=>{
+    it("Is able to sign in if body is incorrect", async () => {
         try {
             const res = await axios.post(`${BACKEND_URL}/user/signin`, {
-                username: USERNAME,
-                password : "password"
+                username: USER_NAME,
+                password: "password"
             });
-            expect(true, "User signed in when it should");
             expect(res.status).toBe(200);
-            expect(res.data.jwt).not.toBeUndefined();
-        } catch (error) {
-            expect(false);
-        }
+            expect(res.data.jwt).toBeDefined();
+        } catch(e) {
+            console.log(e);
+        }   
     })
 })

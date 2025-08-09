@@ -1,0 +1,2 @@
+- [ ] write tests
+- [ ] check the schema so that both the rust and typescript are in sync
