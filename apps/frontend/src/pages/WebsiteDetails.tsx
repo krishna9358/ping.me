@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, ExternalLink, Settings, Trash2 } from 'lucide-react';
+import { ChevronLeft, ExternalLink, Settings, Trash2 } from '../components/icons';
 import { Header } from '../components/layout/Header';
 import { UptimeChart } from '../components/website-details/UptimeChart';
 import { ScreenshotGrid } from '../components/website-details/ScreenshotGrid';
@@ -41,7 +41,7 @@ export const WebsiteDetails: React.FC = () => {
       
       <main className="max-w-7xl mx-auto px-6 py-8">
         {/* Breadcrumb */}
-        <div className="mb-6">
+        <div className="mb-6 animate-slide-up">
           <Link 
             to="/dashboard"
             className="inline-flex items-center text-gray-400 hover:text-accent-400 transition-colors mb-4"

@@ -36,7 +36,7 @@ export const UptimeChart: React.FC<UptimeChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 animate-fade-in">
       <h3 className="text-lg font-semibold text-white mb-4">Response Time (24h)</h3>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">

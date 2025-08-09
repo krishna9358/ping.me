@@ -1,15 +1,17 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ExternalLink, MoreVertical, Trash2, Settings } from 'lucide-react';
+import { ExternalLink, Trash2, Settings } from '../icons';
 import { Website } from '../../types';
 import { StatusPill } from '../ui/StatusPill';
 import { Button } from '../ui/Button';
+import { ConfirmDialog } from '../ui/ConfirmDialog';
 
 interface WebsiteTableProps {
   websites: Website[];
 }
 
 export const WebsiteTable: React.FC<WebsiteTableProps> = ({ websites }) => {
+  const [confirmState, setConfirmState] = useState<{ open: boolean; id?: string; name?: string }>({ open: false });
   const formatLastCheck = (date: Date) => {
     const now = new Date();
     const diff = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
@@ -20,15 +22,20 @@ export const WebsiteTable: React.FC<WebsiteTableProps> = ({ websites }) => {
     return `${Math.floor(diff / 1440)}d ago`;
   };
 
-  const handleDelete = (websiteId: string, websiteName: string) => {
-    if (window.confirm(`Are you sure you want to delete "${websiteName}"?`)) {
-      // In a real app, this would call an API to delete the website
-      console.log('Delete website:', websiteId);
+  const askDelete = (websiteId: string, websiteName: string) => {
+    setConfirmState({ open: true, id: websiteId, name: websiteName });
+  };
+
+  const confirmDelete = () => {
+    if (confirmState.id) {
+      // TODO: call API
+      console.log('Delete website:', confirmState.id);
     }
+    setConfirmState({ open: false });
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+    <div className="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden animate-fade-in">
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead className="bg-gray-900 border-b border-gray-700">
@@ -87,7 +94,7 @@ export const WebsiteTable: React.FC<WebsiteTableProps> = ({ websites }) => {
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      onClick={() => handleDelete(website.id, website.name)}
+                      onClick={() => askDelete(website.id, website.name)}
                       className="text-gray-400 hover:text-red-400"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -109,6 +116,16 @@ export const WebsiteTable: React.FC<WebsiteTableProps> = ({ websites }) => {
           </div>
         </div>
       )}
+      <ConfirmDialog
+        open={confirmState.open}
+        title="Delete website?"
+        description={`This action will remove ${confirmState.name}. You can’t undo this.`}
+        confirmText="Delete"
+        cancelText="Cancel"
+        variant="danger"
+        onConfirm={confirmDelete}
+        onCancel={() => setConfirmState({ open: false })}
+      />
     </div>
   );
 };

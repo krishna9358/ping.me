@@ -1,13 +1,17 @@
 import React from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Activity, Plus, User, LogOut } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Activity, Plus, User, LogOut } from '../icons';
+import { CreateWebsiteModal } from '../dashboard/CreateWebsiteModal';
+import { useState } from 'react';
 import { Button } from '../ui/Button';
 
 interface HeaderProps {
   showCreateButton?: boolean;
+  onWebsiteCreated?: (data: { name: string; url: string }) => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ showCreateButton = true }) => {
+export const Header: React.FC<HeaderProps> = ({ showCreateButton = true, onWebsiteCreated }) => {
+  const [createOpen, setCreateOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -15,23 +19,26 @@ export const Header: React.FC<HeaderProps> = ({ showCreateButton = true }) => {
     navigate('/login');
   };
 
-  const handleCreateWebsite = () => {
-    // In a real app, this would open a modal or navigate to create page
-    alert('Create website modal would open here');
+  const handleCreateWebsite = () => setCreateOpen(true);
+
+  const handleCreated = (data: { name: string; url: string }) => {
+    // TODO: Hook into API once backend is ready
+    onWebsiteCreated?.(data);
   };
 
   return (
-    <header className="bg-gray-800 border-b border-gray-700 px-6 py-4">
+    <header className="bg-gray-800/80 backdrop-blur border-b border-gray-700 px-6 py-4 sticky top-0 z-40">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
-        <Link 
-          to="/dashboard" 
+        <button
+          type="button"
+          onClick={() => navigate('/dashboard')}
           className="flex items-center space-x-3 text-white hover:text-accent-400 transition-colors"
         >
           <div className="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center">
             <Activity className="w-5 h-5 text-white" />
           </div>
-          <span className="text-xl font-semibold">UptimeWatch</span>
-        </Link>
+          <span className="text-xl font-semibold tracking-tight">ping.me</span>
+        </button>
         
         <div className="flex items-center space-x-4">
           {showCreateButton && (
@@ -60,6 +67,11 @@ export const Header: React.FC<HeaderProps> = ({ showCreateButton = true }) => {
           </div>
         </div>
       </div>
+      <CreateWebsiteModal
+        open={createOpen}
+        onClose={() => setCreateOpen(false)}
+        onCreate={handleCreated}
+      />
     </header>
   );
 };

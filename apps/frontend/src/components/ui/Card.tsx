@@ -19,7 +19,7 @@ export const Card: React.FC<CardProps> = ({
   };
 
   return (
-    <div className={`bg-gray-800 border border-gray-700 rounded-xl shadow-xl ${paddingClasses[padding]} ${className}`}>
+    <div className={`bg-gray-800 border border-gray-700 rounded-xl shadow-xl ${paddingClasses[padding]} ${className} animate-fade-in`}>
       {children}
     </div>
   );

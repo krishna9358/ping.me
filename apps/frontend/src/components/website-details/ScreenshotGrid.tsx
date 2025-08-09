@@ -17,21 +17,21 @@ export const ScreenshotGrid: React.FC<ScreenshotGridProps> = ({ screenshots }) =
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 animate-fade-in">
       <h3 className="text-lg font-semibold text-white mb-6">Screenshots</h3>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {screenshots.map((screenshot) => (
           <div 
             key={screenshot.id}
-            className="group cursor-pointer transition-transform hover:scale-105"
+            className="group cursor-pointer transition-transform hover:scale-[1.02]"
             onClick={() => window.open(screenshot.url, '_blank')}
           >
             <div className="relative overflow-hidden rounded-lg bg-gray-900 aspect-[4/3]">
               <img
                 src={screenshot.thumbnailUrl}
                 alt={`Screenshot from ${formatTimestamp(screenshot.timestamp)}`}
-                className="w-full h-full object-cover transition-opacity group-hover:opacity-80"
+                className="w-full h-full object-cover transition-opacity group-hover:opacity-85"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />

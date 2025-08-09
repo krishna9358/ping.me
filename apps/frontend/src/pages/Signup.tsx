@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User } from 'lucide-react';
+import { Mail, Lock, User } from '../components/icons';
 import { AuthLayout } from '../components/layout/AuthLayout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';

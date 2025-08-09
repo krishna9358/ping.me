@@ -46,3 +46,10 @@ button:focus {
   outline: none;
   box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.3);
 }
+
+/* Dotted grid background utility */
+.bg-grid-dots {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1px, transparent 0);
+  background-size: 20px 20px;
+  background-position: -10px -10px;
+}

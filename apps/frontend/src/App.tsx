@@ -4,6 +4,7 @@ import { Login } from './pages/Login';
 import { Signup } from './pages/Signup';
 import { Dashboard } from './pages/Dashboard';
 import { WebsiteDetails } from './pages/WebsiteDetails';
+import { Assistant } from './components/ui/Assistant';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/website/:id" element={<WebsiteDetails />} />
         </Routes>
+        <Assistant />
       </div>
     </Router>
   );
