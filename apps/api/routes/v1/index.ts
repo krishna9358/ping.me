@@ -11,4 +11,6 @@ router.use(express.json());
 router.use("/websites", websitesRouter);
 router.use("/user", userRouter);
 
+// TODO: Create a region endpoint or admin panel to create regions.
+
 export default router;

@@ -7,3 +7,6 @@
 
 - [ ] add more feature like onboarding with integration of bunch of tools, showing data on grafana and prometheus, make ai agent call to send message or alers.
 - [ ] Make contact us endpoint
+
+- [ ] single point of .env for every where  
+- [ ] fix all todos
