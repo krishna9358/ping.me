@@ -2,3 +2,8 @@
 - [ ] check the schema so that both the rust and typescript are in sync
 - [ ] Make the docker container for it , use k8s and use it for production
 - [ ] use rate limiters and everything we can do for production and scalling.   
+- [ ] make better api structure 
+- [ ] make api docs
+
+- [ ] add more feature like onboarding with integration of bunch of tools, showing data on grafana and prometheus, make ai agent call to send message or alers.
+- [ ] Make contact us endpoint

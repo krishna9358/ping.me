@@ -1,5 +1,7 @@
 import axios from "axios"
-import { BACKEND_URL } from "./config"
+
+
+const BACKEND_URL = process.env.BACKEND_URL!
 
 export async function createUser(): Promise<{
     id: string,
