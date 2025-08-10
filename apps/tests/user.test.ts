@@ -1,8 +1,8 @@
-
 import axios from "axios";
 import {describe, expect, it, test} from "bun:test";
-import { BACKEND_URL } from "./config";
 
+
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3000/api/v1"
 const USER_NAME = Math.random().toString();
 
 describe("Signup endpoints", () => {

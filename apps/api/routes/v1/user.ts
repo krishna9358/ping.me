@@ -6,7 +6,7 @@ import jwt from "jsonwebtoken";
 const userRouter = Router();
 
 // =========== SIGNIN ROUTE =============
-userRouter.get("/signin", async (req, res) => {
+userRouter.post("/signin", async (req, res) => {
     // Zod Validation
   const data = AuthInput.safeParse(req.body);
   if (!data.success) {
