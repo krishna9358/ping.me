@@ -1,5 +1,5 @@
 import axios from "axios";
-import { xReadGroup, xAck } from "redis-custom-client/client";
+import { xReadGroup, xAck, xAckBulk } from "redis-custom-client/client";
 import prismaClient from "store/client";
 
 // TODO: make it dynamic , this should be fetched from the database
@@ -12,7 +12,9 @@ async function main(){
     while(1){
         // read from the streams
         const response = await xReadGroup(REGION_ID!, WORKER_ID!);
-
+        if (!response){
+            continue;
+        }
         //process the website and store in db
         // TODO: it should be routed a queue in a bulk db request.
         const promises = response.map(({id,message } : any) =>{
@@ -24,7 +26,7 @@ async function main(){
         console.log(promises.length);
 
         // add ack back to the queue that this event is processed.
-        await xAck(REGION_ID!, response.map(({id}:any) => id));
+        await xAckBulk(REGION_ID!, response.map(({id}:any) => id));
 
     }
 }
