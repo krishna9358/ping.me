@@ -4,7 +4,8 @@
   "type": "module",
   "dependencies": {
     "axios": "^1.11.0",
-    "redis-custom-client": "*"
+    "redis-custom-client": "*",
+    "store": "*"
   },
   "devDependencies": {
     "@types/bun": "latest"
