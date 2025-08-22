@@ -1,4 +1,4 @@
-- [ ] write tests
+- [ ] write and fix tests
 - [ ] check the schema so that both the rust and typescript are in sync
 - [ ] Make the docker container for it , use k8s and use it for production
 - [ ] use rate limiters and everything we can do for production and scalling.   
@@ -10,3 +10,9 @@
 
 - [ ] single point of .env for every where  
 - [ ] fix all todos
+
+- [ ] a better architecture to read from database using redis only. From worker to send the ticks to db through the new redis queue in a db bulk request. 
+
+
+- [ ] use websockets for connecting workers and pushers (not sure, research)
+
