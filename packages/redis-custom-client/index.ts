@@ -62,3 +62,11 @@ export async function xAck(consumerGroup: string, eventId:string){
     );
     return res;
 }
+
+
+// Sends the bulk ack
+export async function xAckBulk(consumerGroup: string, eventIds:string[]) {
+    eventIds.map(eventId => {
+        xAck(consumerGroup, eventId)
+    })
+}
