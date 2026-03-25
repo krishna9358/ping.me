@@ -3,10 +3,6 @@ import { xAddBulk } from 'redis-custom-client/client';
 
 async function main(){
     let websites = await prismaClient.website.findMany({
-        // TODO: Add userId to the where clause
-        // where:{
-        //     userId : ""
-        // },
         select:{
         id:true,
         url:true

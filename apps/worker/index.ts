@@ -1,71 +1,62 @@
 import axios from "axios";
-import { xReadGroup, xAck, xAckBulk } from "redis-custom-client/client";
+import { xReadGroup, xAckBulk } from "redis-custom-client/client";
 import prismaClient from "store/client";
 
-// TODO: make it dynamic , this should be fetched from the database
-// TODO: There is no way for now to create consumer group or region from the platform for admin. Do it cli for now, but later make an endpoint.
 const REGION_ID = process.env.REGION_ID;
 const WORKER_ID = process.env.WORKER_ID;
 
+if (!REGION_ID || !WORKER_ID) {
+    throw new Error("REGION_ID and WORKER_ID must be set in environment variables");
+}
+
+interface TickResult {
+    response_time_ms: number;
+    websiteId: string;
+    regionId: string;
+    status: "Up" | "Down";
+}
+
+async function checkWebsite(url: string, websiteId: string): Promise<TickResult> {
+    const startTime = Date.now();
+    try {
+        await axios.get(url, { timeout: 10000 });
+        return {
+            response_time_ms: Date.now() - startTime,
+            websiteId,
+            regionId: REGION_ID!,
+            status: "Up",
+        };
+    } catch {
+        return {
+            response_time_ms: Date.now() - startTime,
+            websiteId,
+            regionId: REGION_ID!,
+            status: "Down",
+        };
+    }
+}
 
 async function main(){
-    while(1){
-        // read from the streams
+    while(true){
         const response = await xReadGroup(REGION_ID!, WORKER_ID!);
         if (!response){
             continue;
         }
-        //process the website and store in db
-        // TODO: it should be routed a queue in a bulk db request.
-        const promises = response.map(({id,message } : any) =>{
-                const url = message.url;
-                const websiteId = message.id;
-                processWebsiteTick(url, websiteId);
-        })
-        await Promise.all(promises)
-        console.log(promises.length);
 
-        // add ack back to the queue that this event is processed.
-        await xAckBulk(REGION_ID!, response.map(({id}:any) => id));
+        // Check all websites in parallel
+        const results = await Promise.all(
+            response.map(({ message }: any) =>
+                checkWebsite(message.url, message.id)
+            )
+        );
 
+        // Bulk insert all ticks in a single DB call
+        await prismaClient.websiteTick.createMany({ data: results });
+        console.log(`Processed ${results.length} ticks`);
+
+        // Acknowledge all events
+        await xAckBulk(REGION_ID!, response.map(({ id }: any) => id));
     }
-}
-
-async function processWebsiteTick(url: string, websiteId: string){
-    return new Promise<void>((resolve, reject) => {
-    let startTime = Date.now();
-    try {
-        axios.get(url)
-            .then(async () => {
-                const endTime = Date.now();
-                await prismaClient.websiteTick.create({
-                    data : {
-                        response_time_ms : endTime - startTime,
-                        websiteId,
-                        regionId : REGION_ID!,
-                        status: "Up",
-                    }
-                })
-                resolve()
-            })
-            .catch(async () => {
-                const endTime = Date.now();
-                await prismaClient.websiteTick.create({
-                    data : {
-                        response_time_ms : endTime - startTime,
-                        websiteId,
-                        regionId : REGION_ID!,
-                        status: "Down",
-                    }
-                })
-                resolve()
-            })
-
-    } catch (error) {
-        console.log(error);
-        resolve()
-    }
-})
 }
 
 main();
