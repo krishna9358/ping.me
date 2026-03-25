@@ -15,8 +15,7 @@ const client = await createClient({
 
 type WebsiteEvent = {url: string, id: string}
 
-// FUNCTIONS
-// Adds a website to the stream
+// Adds a single website to the stream
 export async function xAdd({url, id} : WebsiteEvent){
     await client.xAdd(
         STREAM_NAME, "*",
@@ -27,15 +26,14 @@ export async function xAdd({url, id} : WebsiteEvent){
     );
 }
 
-// Adds multiple websites to the stream in a bulk
-// TODO: Make this function more efficient, instead of for loop there should be some other way to do it. Send in some batch of data
+// Adds multiple websites to the stream using a Redis pipeline for efficiency
 export async function xAddBulk(websites : WebsiteEvent[]) {
-    for(let i = 0; i < websites.length ; i++){
-        await xAdd({
-            url: websites[i].url,
-            id: websites[i].id
-        });
+    if (websites.length === 0) return;
+    const pipeline = client.multi();
+    for (const w of websites) {
+        pipeline.xAdd(STREAM_NAME, "*", { url: w.url, id: w.id });
     }
+    await pipeline.exec();
 }
 
 // Read from the stream in a consumer group
@@ -53,7 +51,7 @@ export async function xReadGroup(consumerGroup: string, workerId:string): Promis
     return result;
 }
 
-// Sends the ack
+// Sends the ack for a single event
 export async function xAck(consumerGroup: string, eventId:string){
     const res = await client.xAck(
         STREAM_NAME,
@@ -63,10 +61,7 @@ export async function xAck(consumerGroup: string, eventId:string){
     return res;
 }
 
-
-// Sends the bulk ack
+// Sends the ack for multiple events in parallel
 export async function xAckBulk(consumerGroup: string, eventIds:string[]) {
-    eventIds.map(eventId => {
-        xAck(consumerGroup, eventId)
-    })
+    await Promise.all(eventIds.map(eventId => xAck(consumerGroup, eventId)));
 }
