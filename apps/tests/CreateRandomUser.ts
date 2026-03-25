@@ -1,26 +1,27 @@
-import axios from "axios"
-
+import axios from "axios";
 
 const BACKEND_URL =
   process.env.BACKEND_URL ?? "http://localhost:3000/api/v1";
 
 export async function createUser(): Promise<{
-    id: string,
-    jwt: string
+    id: string;
+    jwt: string;
 }> {
-    const USER_NAME = Math.random().toString();
-    const res = await axios.post(`${BACKEND_URL}/user/signup`, {
-        username: USER_NAME,
-        password: "123123123"
-    })
+    const username = `test_${Math.random().toString(36).slice(2)}`;
+    const password = "testpass123";
+
+    const signupRes = await axios.post(`${BACKEND_URL}/user/signup`, {
+        username,
+        password,
+    });
 
     const signinRes = await axios.post(`${BACKEND_URL}/user/signin`, {
-        username: USER_NAME,
-        password: "123123123"
-    })
+        username,
+        password,
+    });
 
     return {
-        id: res.data.id,
-        jwt: signinRes.data.jwt
-    }
+        id: signupRes.data.id,
+        jwt: signinRes.data.jwt,
+    };
 }

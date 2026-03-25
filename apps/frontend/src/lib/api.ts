@@ -19,7 +19,15 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   if (res.status === 204) {
     return undefined as T;
   }
-  return res.json() as Promise<T>;
+  const raw = await res.text();
+  if (!raw) {
+    return undefined as T;
+  }
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    throw new Error(`Invalid JSON response: ${raw.slice(0, 120)}`);
+  }
 }
 
 export async function signIn(body: { username: string; password: string }) {

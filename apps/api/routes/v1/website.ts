@@ -38,7 +38,7 @@ websitesRouter.get("/status/:websiteId", authMiddleware, async (req, res) => {
   });
 
   if (!website) {
-    res.status(404).send("website not found");
+    res.status(404).json({ error: "website not found" });
     return;
   }
 
@@ -58,22 +58,27 @@ websitesRouter.post("/website", authMiddleware, async (req, res) => {
   });
 
   if (!user) {
-    res.status(404).send("User not found");
+    res.status(404).json({ error: "User not found" });
     return;
   }
 
   try {
-    // TODO: Don't use this method to get the regions do something different. May be add region iD in req type. or something
-    // First, find any region (or create one if none exists)
-    let region = await prismaClient.region.findFirst();
+    const regionId = req.body.regionId;
+    let region;
 
-    if (!region) {
-      // Create a default region if none exists
-      region = await prismaClient.region.create({
-        data: {
-          name: "Default Region",
-        },
-      });
+    if (regionId) {
+      region = await prismaClient.region.findUnique({ where: { id: regionId } });
+      if (!region) {
+        res.status(400).json({ error: "Region not found" });
+        return;
+      }
+    } else {
+      region = await prismaClient.region.findFirst();
+      if (!region) {
+        region = await prismaClient.region.create({
+          data: { name: "Default Region" },
+        });
+      }
     }
 
     const website = await prismaClient.website.create({
