@@ -1,0 +1,101 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pingme
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  migrate:
+    build:
+      context: .
+      target: api
+    command: ["bun", "prisma", "migrate", "deploy", "--schema", "packages/store/prisma/schema.prisma"]
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/pingme
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build:
+      context: .
+      target: api
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/pingme
+      REDIS_URL: redis://redis:6379
+      STREAM_NAME: pingme:website
+      PORT: 3000
+      JWT_SECRET: ${JWT_SECRET:-change-me-to-a-random-secret}
+      FRONTEND_ORIGIN: ${FRONTEND_ORIGIN:-http://localhost}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: .
+      target: worker
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/pingme
+      REDIS_URL: redis://redis:6379
+      STREAM_NAME: pingme:website
+      REGION_ID: ${REGION_ID:-default}
+      WORKER_ID: ${WORKER_ID:-worker-1}
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  pusher:
+    build:
+      context: .
+      target: pusher
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/pingme
+      REDIS_URL: redis://redis:6379
+      STREAM_NAME: pingme:website
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      target: frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000/api/v1}
+    ports:
+      - "80:80"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

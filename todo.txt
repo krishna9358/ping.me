@@ -1,18 +1,16 @@
-- [ ] write and fix tests
+- [x] write and fix tests
 - [ ] check the schema so that both the rust and typescript are in sync
-- [ ] Make the docker container for it , use k8s and use it for production
-- [ ] use rate limiters and everything we can do for production and scalling.   
-- [ ] make better api structure 
+- [x] Make the docker container for it , use k8s and use it for production
+- [ ] use rate limiters and everything we can do for production and scalling.
+- [x] make better api structure
 - [ ] make api docs
 
 - [ ] add more feature like onboarding with integration of bunch of tools, showing data on grafana and prometheus, make ai agent call to send message or alers.
 - [ ] Make contact us endpoint
 
-- [ ] single point of .env for every where  
-- [ ] fix all todos
+- [x] single point of .env for every where
+- [x] fix all todos
 
-- [ ] a better architecture to read from database using redis only. From worker to send the ticks to db through the new redis queue in a db bulk request. 
-
+- [x] a better architecture to read from database using redis only. From worker to send the ticks to db through the new redis queue in a db bulk request.
 
 - [ ] use websockets for connecting workers and pushers (not sure, research)
-
