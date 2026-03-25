@@ -1,28 +1,44 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock } from '../components/icons';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Lock, User } from '../components/icons';
 import { AuthLayout } from '../components/layout/AuthLayout';
-import { Card } from '../components/ui/Card';
+import { Card } from '@repo/ui/card';
+import { Button } from '@repo/ui/button';
 import { Input } from '../components/ui/Input';
-import { Button } from '../components/ui/Button';
+import { useAuth } from '../context/AuthContext';
+import { signIn } from '../lib/api';
 
 export const Login: React.FC = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    username: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const navigate = useNavigate();
+  const location = useLocation();
+  const { setToken } = useAuth();
+
+  const from =
+    (location.state as { from?: { pathname: string } } | null)?.from
+      ?.pathname ?? '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setLoading(true);
-    
-    // Simulate API call
-    setTimeout(() => {
+    try {
+      const res = await signIn({
+        username: formData.username,
+        password: formData.password,
+      });
+      setToken(res.jwt);
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Sign in failed');
+    } finally {
       setLoading(false);
-      navigate('/dashboard');
-    }, 1500);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,16 +57,23 @@ export const Login: React.FC = () => {
             <p className="text-gray-400 text-center">Sign in to your account to continue</p>
           </div>
 
+          {error ? (
+            <p className="text-sm text-red-400 text-center bg-red-950/40 border border-red-800/60 rounded-lg py-2 px-3">
+              {error}
+            </p>
+          ) : null}
+
           <div className="space-y-4">
             <Input
-              type="email"
-              name="email"
-              label="Email"
-              placeholder="Enter your email"
-              icon={Mail}
-              value={formData.email}
+              type="text"
+              name="username"
+              label="Username"
+              placeholder="Your username"
+              icon={User}
+              value={formData.username}
               onChange={handleChange}
               required
+              autoComplete="username"
             />
 
             <Input
@@ -62,6 +85,7 @@ export const Login: React.FC = () => {
               value={formData.password}
               onChange={handleChange}
               required
+              autoComplete="current-password"
             />
           </div>
 

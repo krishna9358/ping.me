@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Modal } from './Modal';
-import { Button } from './Button';
-import { MessageCircle, X } from 'lucide-react';
+import { Button } from '@repo/ui/button';
+import { MessageCircle } from 'lucide-react';
 
 export const Assistant: React.FC = () => {
   const [open, setOpen] = useState(false);

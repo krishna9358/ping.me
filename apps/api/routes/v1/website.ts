@@ -1,11 +1,24 @@
 import { Router } from "express";
 import prismaClient from "store/client";
 import express from "express";
-import { AuthInput } from "./types";
 import { authMiddleware } from "../../middleware";
 const websitesRouter = Router();
 
 websitesRouter.use(express.json());
+
+websitesRouter.get("/", authMiddleware, async (req, res) => {
+    const websites = await prismaClient.website.findMany({
+        where: { userId: req.userId! },
+        include: {
+            ticks: {
+                orderBy: { createdAt: "desc" },
+                take: 100,
+            },
+        },
+        orderBy: { timeAdded: "desc" },
+    });
+    res.json({ websites });
+});
 
 websitesRouter.get("/status/:websiteId", authMiddleware, async (req, res) => {
   // Finding the 1st website tick in descending order( the latest or recent one)
@@ -19,7 +32,7 @@ websitesRouter.get("/status/:websiteId", authMiddleware, async (req, res) => {
         orderBy: {
           createdAt: "desc",
         },
-        take: 10,
+        take: 100,
       },
     },
   });
@@ -80,6 +93,20 @@ websitesRouter.post("/website", authMiddleware, async (req, res) => {
       details: error as string,
     });
   }
+});
+
+websitesRouter.delete("/website/:websiteId", authMiddleware, async (req, res) => {
+    const deleted = await prismaClient.website.deleteMany({
+        where: {
+            id: req.params.websiteId,
+            userId: req.userId!,
+        },
+    });
+    if (deleted.count === 0) {
+        res.status(404).json({ error: "website not found" });
+        return;
+    }
+    res.status(204).send();
 });
 
 export default websitesRouter;

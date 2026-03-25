@@ -3,14 +3,16 @@ import { Link } from 'react-router-dom';
 import { ExternalLink, Trash2, Settings } from '../icons';
 import { Website } from '../../types';
 import { StatusPill } from '../ui/StatusPill';
-import { Button } from '../ui/Button';
+import { Button } from '@repo/ui/button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
+import { deleteWebsite } from '../../lib/api';
 
 interface WebsiteTableProps {
   websites: Website[];
+  onDeleted?: () => void | Promise<void>;
 }
 
-export const WebsiteTable: React.FC<WebsiteTableProps> = ({ websites }) => {
+export const WebsiteTable: React.FC<WebsiteTableProps> = ({ websites, onDeleted }) => {
   const [confirmState, setConfirmState] = useState<{ open: boolean; id?: string; name?: string }>({ open: false });
   const formatLastCheck = (date: Date) => {
     const now = new Date();
@@ -27,11 +29,17 @@ export const WebsiteTable: React.FC<WebsiteTableProps> = ({ websites }) => {
   };
 
   const confirmDelete = () => {
-    if (confirmState.id) {
-      // TODO: call API
-      console.log('Delete website:', confirmState.id);
-    }
+    const id = confirmState.id;
     setConfirmState({ open: false });
+    if (!id) return;
+    void (async () => {
+      try {
+        await deleteWebsite(id);
+        await onDeleted?.();
+      } catch (e) {
+        window.alert(e instanceof Error ? e.message : 'Delete failed');
+      }
+    })();
   };
 
   return (

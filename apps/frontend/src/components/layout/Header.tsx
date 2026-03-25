@@ -1,29 +1,29 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Activity, Plus, User, LogOut } from '../icons';
 import { CreateWebsiteModal } from '../dashboard/CreateWebsiteModal';
-import { useState } from 'react';
-import { Button } from '../ui/Button';
+import { Button } from '@repo/ui/button';
+import { useAuth } from '../../context/AuthContext';
 
 interface HeaderProps {
   showCreateButton?: boolean;
-  onWebsiteCreated?: (data: { name: string; url: string }) => void;
+  onWebsiteCreated?: (data: { name: string; url: string }) => void | Promise<void>;
 }
 
 export const Header: React.FC<HeaderProps> = ({ showCreateButton = true, onWebsiteCreated }) => {
   const [createOpen, setCreateOpen] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const handleLogout = () => {
-    // In a real app, you'd clear auth tokens here
+    logout();
     navigate('/login');
   };
 
   const handleCreateWebsite = () => setCreateOpen(true);
 
-  const handleCreated = (data: { name: string; url: string }) => {
-    // TODO: Hook into API once backend is ready
-    onWebsiteCreated?.(data);
+  const handleCreated = async (data: { name: string; url: string }) => {
+    await onWebsiteCreated?.(data);
   };
 
   return (
@@ -53,12 +53,13 @@ export const Header: React.FC<HeaderProps> = ({ showCreateButton = true, onWebsi
           )}
           
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" type="button">
               <User className="w-4 h-4" />
             </Button>
             <Button 
               variant="ghost" 
               size="sm" 
+              type="button"
               onClick={handleLogout}
               className="text-gray-400 hover:text-red-400"
             >

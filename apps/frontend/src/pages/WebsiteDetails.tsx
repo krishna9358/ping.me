@@ -1,18 +1,86 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ChevronLeft, ExternalLink, Settings, Trash2 } from '../components/icons';
 import { Header } from '../components/layout/Header';
 import { UptimeChart } from '../components/website-details/UptimeChart';
 import { ScreenshotGrid } from '../components/website-details/ScreenshotGrid';
 import { StatusPill } from '../components/ui/StatusPill';
-import { Button } from '../components/ui/Button';
-import { mockWebsites, generateUptimeData, generateScreenshots } from '../data/mockData';
+import { Button } from '@repo/ui/button';
+import { deleteWebsite, getWebsiteWithTicks } from '../lib/api';
+import type { ApiWebsite } from '../lib/mapWebsite';
+import { mapApiWebsiteToWebsite } from '../lib/mapWebsite';
+import type { UptimeData } from '../types';
 
 export const WebsiteDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const website = mockWebsites.find(w => w.id === id);
-  
-  if (!website) {
+  const navigate = useNavigate();
+  const [raw, setRaw] = useState<ApiWebsite | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    (async () => {
+      try {
+        const { website } = await getWebsiteWithTicks(id);
+        if (!cancelled) {
+          setRaw(website);
+          setError('');
+        }
+      } catch {
+        if (!cancelled) {
+          setError('Could not load this website.');
+          setRaw(null);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
+
+  const website = useMemo(
+    () => (raw ? mapApiWebsiteToWebsite(raw) : null),
+    [raw],
+  );
+
+  const uptimeData: UptimeData[] = useMemo(() => {
+    if (!raw?.ticks?.length) return [];
+    return [...raw.ticks].reverse().map((t) => ({
+      timestamp: new Date(t.createdAt),
+      status: t.status === 'Up' ? 'up' : 'down',
+      responseTime: t.response_time_ms,
+    }));
+  }, [raw]);
+
+  const handleDelete = async () => {
+    if (!website) return;
+    if (!window.confirm(`Are you sure you want to remove monitoring for "${website.name}"?`)) {
+      return;
+    }
+    try {
+      await deleteWebsite(website.id);
+      navigate('/dashboard');
+    } catch (e) {
+      window.alert(e instanceof Error ? e.message : 'Delete failed');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+        <p className="text-gray-400">Loading…</p>
+      </div>
+    );
+  }
+
+  if (error || !website) {
     return (
       <div className="min-h-screen bg-dark-900 flex items-center justify-center">
         <div className="text-center">
@@ -25,22 +93,11 @@ export const WebsiteDetails: React.FC = () => {
     );
   }
 
-  const uptimeData = generateUptimeData(website.id);
-  const screenshots = generateScreenshots(website.id);
-
-  const handleDelete = () => {
-    if (window.confirm(`Are you sure you want to delete "${website.name}"?`)) {
-      // In a real app, this would call an API and redirect
-      console.log('Delete website:', website.id);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-dark-900">
       <Header showCreateButton={false} />
       
       <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Breadcrumb */}
         <div className="mb-6 animate-slide-up">
           <Link 
             to="/dashboard"
@@ -51,7 +108,6 @@ export const WebsiteDetails: React.FC = () => {
           </Link>
         </div>
 
-        {/* Website Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">{website.name}</h1>
@@ -72,21 +128,21 @@ export const WebsiteDetails: React.FC = () => {
           </div>
           
           <div className="flex items-center space-x-3 mt-4 sm:mt-0">
-            <Button variant="secondary" size="md" icon={Settings}>
+            <Button variant="secondary" size="md" icon={Settings} type="button">
               Settings
             </Button>
             <Button 
               variant="danger" 
               size="md" 
               icon={Trash2}
-              onClick={handleDelete}
+              type="button"
+              onClick={() => void handleDelete()}
             >
               Delete
             </Button>
           </div>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
             <p className="text-sm text-gray-400 mb-1">Current Status</p>
@@ -113,13 +169,11 @@ export const WebsiteDetails: React.FC = () => {
           </div>
         </div>
 
-        {/* Uptime Chart */}
         <div className="mb-8">
           <UptimeChart data={uptimeData} />
         </div>
 
-        {/* Screenshots */}
-        <ScreenshotGrid screenshots={screenshots} />
+        <ScreenshotGrid screenshots={[]} />
       </main>
     </div>
   );

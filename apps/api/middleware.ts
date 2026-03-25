@@ -16,8 +16,17 @@ import jwt from "jsonwebtoken";
 //     }
 // }
 
+function getBearerToken(authorization: string | undefined): string | undefined {
+    if (!authorization) return undefined;
+    const trimmed = authorization.trim();
+    if (trimmed.toLowerCase().startsWith("bearer ")) {
+        return trimmed.slice(7).trim();
+    }
+    return trimmed;
+}
+
 export function authMiddleware(req: Request, res: Response, next: NextFunction) {
-    const token = req.headers.authorization?.split(" ")[1];
+    const token = getBearerToken(req.headers.authorization);
     if (!token) {
         res.status(401).json({ message: "Unauthorized" });
         return;

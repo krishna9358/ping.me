@@ -1,6 +1,6 @@
 import React from 'react';
 import { Modal } from './Modal';
-import { Button } from './Button';
+import { Button } from '@repo/ui/button';
 
 interface ConfirmDialogProps {
   open: boolean;
