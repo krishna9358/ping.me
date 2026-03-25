@@ -2,16 +2,83 @@
 
 A Bun/TypeScript monorepo for monitoring site availability: a REST API and React dashboard tied to PostgreSQL, with checks scheduled through **Redis Streams** and **worker** consumers.
 
+## Architecture
+
+```
+                         ┌─────────────────────────────────┐
+                         │           User / Browser         │
+                         └──────────┬──────────────────────┘
+                                    │
+                                    ▼
+                    ┌───────────────────────────────┐
+                    │     Frontend (React + Vite)    │
+                    │  Login, Dashboard, Charts, UI  │
+                    │   Nginx in prod / Vite in dev  │
+                    └──────────┬────────────────────┘
+                               │ REST calls (JWT auth)
+                               ▼
+                    ┌───────────────────────────────┐
+                    │    API  (Express + Zod + JWT)  │
+                    │  /user  /websites  /regions     │
+                    └──────────┬────────────────────┘
+                               │ Prisma ORM
+                               ▼
+               ┌───────────────────────────────────────┐
+               │          PostgreSQL Database            │
+               │  User  Website  Region  WebsiteTick    │
+               └──────┬───────────────────────┬────────┘
+                      │                       ▲
+                      │ reads websites        │ bulk insert ticks
+                      ▼                       │
+            ┌──────────────────┐    ┌──────────────────┐
+            │     Pusher       │    │     Worker        │
+            │  (Scheduler)     │    │  (HTTP Checker)   │
+            │  Runs every 3min │    │  Pings each URL   │
+            └────────┬─────────┘    └──────┬───────────┘
+                     │                     ▲
+                     │  XADD (pipeline)    │ XREADGROUP
+                     ▼                     │
+            ┌──────────────────────────────────────────┐
+            │          Redis Stream                     │
+            │  Job queue with consumer groups + ack     │
+            └──────────────────────────────────────────┘
+```
+
+### How it works
+
+1. **User adds a URL** via the React dashboard. The frontend sends a `POST` to the API, which saves the website to PostgreSQL.
+
+2. **Pusher runs every 3 minutes.** It reads all website URLs from the database and pushes them into a Redis Stream using a pipeline (single round-trip, not one-by-one).
+
+3. **Worker picks up jobs** from the Redis Stream via consumer groups. Each message goes to exactly one worker — no duplicates. The worker pings each URL, measures response time, and records the result ("Up" or "Down") as a `WebsiteTick`.
+
+4. **Bulk DB writes.** The worker inserts all ticks in a single `createMany` call instead of individual inserts, reducing database round-trips.
+
+5. **Acknowledgment.** After processing, the worker sends `XACK` back to Redis so the message won't be re-delivered. If a worker crashes before acking, Redis can reassign the message.
+
+6. **Dashboard displays results.** The frontend fetches the user's websites with their latest 100 ticks and renders status pills, uptime percentages, and response-time charts (Recharts).
+
+### Why each piece exists
+
+| Component | Why it's needed |
+|-----------|----------------|
+| **Redis Streams** | Decouples scheduling from checking. Multiple workers can consume in parallel without duplicating work. If a worker dies, unacked messages get retried. |
+| **Pusher (separate from API)** | The API handles user requests; the pusher is a background cron. Separating them means the API stays fast and the scheduler can run independently. |
+| **Worker (separate process)** | HTTP checks are slow (network I/O). Running them in a dedicated process keeps the API responsive and lets you scale workers horizontally. |
+| **Nginx (production only)** | `vite build` outputs static HTML/CSS/JS. In production there's no Vite dev server — Nginx serves those files and handles SPA routing (all paths → `index.html` so React Router works). In development, Vite's dev server handles this instead. |
+| **Prisma** | Type-safe database access shared across API, worker, and pusher via the `packages/store` workspace package. |
+| **Consumer groups** | Let you run multiple workers across regions. Each worker in a group gets unique messages, enabling horizontal scaling without coordination. |
+
 ## Features
 
 - **Dashboard**: add/delete monitored URLs, view recent checks and response times.
 - **Authentication**: signup/sign-in with JWT; passwords stored as **bcrypt** hashes (`Bun.password`).
-- **REST API** (`/api/v1`): users, websites, latest ticks.
-- **Check pipeline**: scheduler (`apps/pusher`) enqueues URLs; workers (`apps/worker`) HTTP-check and write **WebsiteTick** rows.
+- **REST API** (`/api/v1`): users, websites, regions, latest ticks.
+- **Check pipeline**: scheduler (`apps/pusher`) enqueues URLs via Redis pipeline; workers (`apps/worker`) HTTP-check and bulk-write **WebsiteTick** rows.
 - **Data model**: users, regions, websites, ticks (Prisma / PostgreSQL).
 - **Shared UI**: `packages/ui` (`@repo/ui`) — Button, Card — consumed by the Vite frontend.
 
-Planned or partial (not fully productized): multi-region admin UX, outbound notifications (email/Slack), live UI push, screenshot capture.
+Planned or partial: multi-region admin UX, outbound notifications (email/Slack), live UI push, screenshot capture.
 
 ## Tech stack
 
@@ -23,6 +90,7 @@ Planned or partial (not fully productized): multi-region admin UX, outbound noti
 | Frontend | React, Vite, Tailwind CSS, Recharts |
 | Queue | Redis Streams (`packages/redis-custom-client`) |
 | Tests | Bun test (`apps/tests`) |
+| Container | Docker, Docker Compose, Nginx |
 | Package manager | Bun (`packageManager` in root `package.json`) |
 
 ## Project structure
@@ -41,9 +109,12 @@ better-uptime/
 │   ├── redis-custom-client/
 │   ├── typescript-config/
 │   └── eslint-config/
+├── Dockerfile            # Multi-stage build (api, worker, pusher, frontend)
+├── docker-compose.yml    # Full stack: Postgres + Redis + all services
+├── nginx.conf            # SPA routing for production frontend
 ├── turbo.json
 ├── package.json
-└── .env.example
+└── .env.example          # Single env file for all services
 ```
 
 ## Prerequisites
@@ -55,7 +126,22 @@ better-uptime/
 
 ## Getting started
 
-### 1. Clone and install
+### Option A: Docker (recommended)
+
+```bash
+git clone https://github.com/krishna9358/ping.me.git
+cd ping.me
+cp .env.example .env    # edit secrets as needed
+docker compose up --build
+```
+
+This starts PostgreSQL, Redis, runs migrations, and launches all services:
+- Frontend: `http://localhost`
+- API: `http://localhost:3000`
+
+### Option B: Local development
+
+#### 1. Clone and install
 
 ```bash
 git clone https://github.com/krishna9358/ping.me.git
@@ -63,28 +149,23 @@ cd ping.me
 bun install
 ```
 
-### 2. Environment variables
+#### 2. Environment variables
 
-Copy the root example and fill in values:
+All services read from a **single root `.env`**:
 
 ```bash
 cp .env.example .env
 ```
 
-Use the same `DATABASE_URL` (and any Prisma-related vars) under `packages/store` when running migrations. For Redis, align with `packages/redis-custom-client/.env.example` (`REDIS_URL`, `STREAM_NAME`).
-
-### 3. Database
+#### 3. Database
 
 ```bash
-cd packages/store
-bun prisma migrate dev
+bun db:migrate
 ```
 
-### 4. Run the app locally
+#### 4. Run the app locally
 
-From the **repository root**, with `.env` loaded (or export vars in your shell):
-
-**API** (default port `3000` unless `PORT` is set):
+**API** (default port `3000`):
 
 ```bash
 cd apps/api
@@ -98,10 +179,10 @@ cd apps/frontend
 bun run dev
 ```
 
-**Optional — check pipeline** (requires Redis + `REGION_ID` / `WORKER_ID` for the consumer group, plus stream env for the client):
+**Check pipeline** (requires Redis):
 
 ```bash
-# Scheduler: enqueue sites every few minutes
+# Scheduler: enqueue sites every 3 minutes
 cd apps/pusher
 bun run index.ts
 
@@ -110,60 +191,54 @@ cd apps/worker
 bun run index.ts
 ```
 
-Root `bun dev` runs Turborepo `dev` tasks that exist in workspace packages (currently the frontend is the main long-running dev server). Start the API (and Redis pipeline if needed) in separate terminals.
+## Environment variables
 
-### 5. Frontend API URL
+All variables live in the **root `.env`** file. No sub-directory env files needed.
 
-The SPA defaults to `http://localhost:3000/api/v1`. Override with:
+| Variable | Used by | Purpose |
+|----------|---------|---------|
+| `DATABASE_URL` | API, Worker, Pusher | PostgreSQL connection string |
+| `REDIS_URL` | Worker, Pusher | Redis connection URL |
+| `STREAM_NAME` | Worker, Pusher | Redis stream key for check jobs |
+| `PORT` | API | HTTP port (default `3000`) |
+| `JWT_SECRET` | API | Secret for signing JWTs |
+| `FRONTEND_ORIGIN` | API | CORS origin (default `http://localhost:5173`) |
+| `REGION_ID` | Worker | Consumer group / region identifier |
+| `WORKER_ID` | Worker | Consumer name within the group |
+| `VITE_API_URL` | Frontend | API base URL (baked in at build time) |
+| `BACKEND_URL` | Tests | API URL for integration tests |
 
-```bash
-# apps/frontend/.env
-VITE_API_URL=http://localhost:3000/api/v1
-```
+## API endpoints
 
-## Environment variables (reference)
-
-### API (`apps/api`)
-
-| Variable | Purpose |
-|----------|---------|
-| `PORT` | HTTP port (default `3000`) |
-| `DATABASE_URL` | PostgreSQL connection string |
-| `JWT_SECRET` | Secret for signing JWTs |
-| `FRONTEND_ORIGIN` | CORS origin for the Vite app (default `http://localhost:5173`) |
-
-### Frontend (`apps/frontend`)
-
-| Variable | Purpose |
-|----------|---------|
-| `VITE_API_URL` | Base URL for REST calls (optional; has a localhost default) |
-
-### Redis client (`pusher`, `worker`, `redis-custom-client`)
-
-| Variable | Purpose |
-|----------|---------|
-| `REDIS_URL` | Redis connection URL |
-| `STREAM_NAME` | Stream key for website check jobs |
-| `REGION_ID` | Consumer group name / region id (worker) |
-| `WORKER_ID` | Consumer name (worker) |
-
-Legacy Pusher.com variables are **not** used by this codebase; the `apps/pusher` name refers to **pushing jobs into Redis**.
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/v1/user/signup` | No | Create account |
+| POST | `/api/v1/user/signin` | No | Login, get JWT |
+| GET | `/api/v1/websites` | Yes | List user's websites + ticks |
+| POST | `/api/v1/websites/website` | Yes | Add URL to monitor |
+| GET | `/api/v1/websites/status/:id` | Yes | Single website + ticks |
+| DELETE | `/api/v1/websites/website/:id` | Yes | Remove monitoring |
+| GET | `/api/v1/regions` | No | List regions |
+| POST | `/api/v1/regions` | No | Create region |
+| DELETE | `/api/v1/regions/:id` | No | Delete region |
 
 ## Tests
 
 ```bash
-# From repo root, with API running and BACKEND_URL if non-default
+# Start the API first, then:
 bun test
 
-# Example: single file
+# Single file
 bun test apps/tests/website.test.ts
 ```
 
 ## Development
 
-- **Lint**: `bun lint` (Turborepo)
+- **Lint**: `bun lint`
 - **Types**: `bun check-types`
-- **Format**: `bun format` (Prettier)
+- **Format**: `bun format`
+- **Migrations**: `bun db:migrate`
+- **Prisma Studio**: `bun db:studio`
 
 ---
 
