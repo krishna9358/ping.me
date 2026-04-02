@@ -7,17 +7,17 @@ const websitesRouter = Router();
 websitesRouter.use(express.json());
 
 websitesRouter.get("/", authMiddleware, async (req, res) => {
-    const websites = await prismaClient.website.findMany({
-        where: { userId: req.userId! },
-        include: {
-            ticks: {
-                orderBy: { createdAt: "desc" },
-                take: 100,
-            },
-        },
-        orderBy: { timeAdded: "desc" },
-    });
-    res.json({ websites });
+  const websites = await prismaClient.website.findMany({
+    where: { userId: req.userId! },
+    include: {
+      ticks: {
+        orderBy: { createdAt: "desc" },
+        take: 100,
+      },
+    },
+    orderBy: { timeAdded: "desc" },
+  });
+  res.json({ websites });
 });
 
 websitesRouter.get("/status/:websiteId", authMiddleware, async (req, res) => {
@@ -52,9 +52,9 @@ websitesRouter.post("/website", authMiddleware, async (req, res) => {
     res.status(411).json({});
     return;
   }
-   // Verify user exists
-   const user = await prismaClient.user.findUnique({
-    where: { id: req.userId! }
+  // Verify user exists
+  const user = await prismaClient.user.findUnique({
+    where: { id: req.userId! },
   });
 
   if (!user) {
@@ -67,7 +67,9 @@ websitesRouter.post("/website", authMiddleware, async (req, res) => {
     let region;
 
     if (regionId) {
-      region = await prismaClient.region.findUnique({ where: { id: regionId } });
+      region = await prismaClient.region.findUnique({
+        where: { id: regionId },
+      });
       if (!region) {
         res.status(400).json({ error: "Region not found" });
         return;
@@ -100,18 +102,22 @@ websitesRouter.post("/website", authMiddleware, async (req, res) => {
   }
 });
 
-websitesRouter.delete("/website/:websiteId", authMiddleware, async (req, res) => {
+websitesRouter.delete(
+  "/website/:websiteId",
+  authMiddleware,
+  async (req, res) => {
     const deleted = await prismaClient.website.deleteMany({
-        where: {
-            id: req.params.websiteId,
-            userId: req.userId!,
-        },
+      where: {
+        id: req.params.websiteId,
+        userId: req.userId!,
+      },
     });
     if (deleted.count === 0) {
-        res.status(404).json({ error: "website not found" });
-        return;
+      res.status(404).json({ error: "website not found" });
+      return;
     }
     res.status(204).send();
-});
+  },
+);
 
 export default websitesRouter;

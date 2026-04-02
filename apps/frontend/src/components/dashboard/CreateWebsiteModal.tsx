@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Modal } from '../ui/Modal';
-import { Input } from '../ui/Input';
-import { Button } from '@repo/ui/button';
-import { Globe } from '../icons';
+import React, { useState } from "react";
+import { Modal } from "../ui/Modal";
+import { Input } from "../ui/Input";
+import { Button } from "@repo/ui/button";
+import { Globe } from "../icons";
 
 interface CreateWebsiteModalProps {
   open: boolean;
@@ -15,23 +15,23 @@ export const CreateWebsiteModal: React.FC<CreateWebsiteModalProps> = ({
   onClose,
   onCreate,
 }) => {
-  const [name, setName] = useState('');
-  const [url, setUrl] = useState('');
+  const [name, setName] = useState("");
+  const [url, setUrl] = useState("");
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !url) return;
-    setError('');
+    setError("");
     setSubmitting(true);
     try {
       await onCreate({ name, url });
-      setName('');
-      setUrl('');
+      setName("");
+      setUrl("");
       onClose();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not create website');
+      setError(err instanceof Error ? err.message : "Could not create website");
     } finally {
       setSubmitting(false);
     }
@@ -80,4 +80,3 @@ export const CreateWebsiteModal: React.FC<CreateWebsiteModalProps> = ({
     </Modal>
   );
 };
-

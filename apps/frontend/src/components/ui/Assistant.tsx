@@ -1,28 +1,33 @@
-import React, { useState } from 'react';
-import { Modal } from './Modal';
-import { Button } from '@repo/ui/button';
-import { MessageCircle } from 'lucide-react';
+import React, { useState } from "react";
+import { Modal } from "./Modal";
+import { Button } from "@repo/ui/button";
+import { MessageCircle } from "lucide-react";
 
 export const Assistant: React.FC = () => {
   const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([
-    { role: 'assistant', content: 'Hi! How can I help you with ping.me today?' },
+  const [query, setQuery] = useState("");
+  const [messages, setMessages] = useState<
+    Array<{ role: "user" | "assistant"; content: string }>
+  >([
+    {
+      role: "assistant",
+      content: "Hi! How can I help you with ping.me today?",
+    },
   ]);
   const [loading, setLoading] = useState(false);
 
   const send = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
-    const userMsg = { role: 'user' as const, content: query };
+    const userMsg = { role: "user" as const, content: query };
     setMessages((m) => [...m, userMsg]);
-    setQuery('');
+    setQuery("");
     setLoading(true);
     try {
       // Placeholder AI: echo with helpful hint. Integrate real API later.
       await new Promise((r) => setTimeout(r, 500));
       const reply = {
-        role: 'assistant' as const,
+        role: "assistant" as const,
         content: `I understand: "${userMsg.content}". You can manage websites from the Dashboard, use Create Website to add a new URL, and open details to view uptime and screenshots.`,
       };
       setMessages((m) => [...m, reply]);
@@ -54,12 +59,15 @@ export const Assistant: React.FC = () => {
         <div className="flex flex-col space-y-4">
           <div className="h-64 overflow-y-auto rounded-lg border border-gray-700 p-3 bg-gray-900">
             {messages.map((m, i) => (
-              <div key={i} className={`mb-3 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
+              <div
+                key={i}
+                className={`mb-3 ${m.role === "user" ? "text-right" : "text-left"}`}
+              >
                 <span
                   className={`inline-block px-3 py-2 rounded-lg ${
-                    m.role === 'user'
-                      ? 'bg-accent-500 text-white'
-                      : 'bg-gray-800 text-gray-100 border border-gray-700'
+                    m.role === "user"
+                      ? "bg-accent-500 text-white"
+                      : "bg-gray-800 text-gray-100 border border-gray-700"
                   }`}
                 >
                   {m.content}
@@ -75,7 +83,7 @@ export const Assistant: React.FC = () => {
               onChange={(e) => setQuery(e.target.value)}
             />
             <Button type="submit" variant="primary" disabled={loading}>
-              {loading ? 'Thinking…' : 'Send'}
+              {loading ? "Thinking…" : "Send"}
             </Button>
           </form>
         </div>
@@ -83,5 +91,3 @@ export const Assistant: React.FC = () => {
     </>
   );
 };
-
-

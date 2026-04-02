@@ -60,14 +60,14 @@ A Bun/TypeScript monorepo for monitoring site availability: a REST API and React
 
 ### Why each piece exists
 
-| Component | Why it's needed |
-|-----------|----------------|
-| **Redis Streams** | Decouples scheduling from checking. Multiple workers can consume in parallel without duplicating work. If a worker dies, unacked messages get retried. |
-| **Pusher (separate from API)** | The API handles user requests; the pusher is a background cron. Separating them means the API stays fast and the scheduler can run independently. |
-| **Worker (separate process)** | HTTP checks are slow (network I/O). Running them in a dedicated process keeps the API responsive and lets you scale workers horizontally. |
-| **Nginx (production only)** | `vite build` outputs static HTML/CSS/JS. In production there's no Vite dev server — Nginx serves those files and handles SPA routing (all paths → `index.html` so React Router works). In development, Vite's dev server handles this instead. |
-| **Prisma** | Type-safe database access shared across API, worker, and pusher via the `packages/store` workspace package. |
-| **Consumer groups** | Let you run multiple workers across regions. Each worker in a group gets unique messages, enabling horizontal scaling without coordination. |
+| Component                      | Why it's needed                                                                                                                                                                                                                                |
+| ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Redis Streams**              | Decouples scheduling from checking. Multiple workers can consume in parallel without duplicating work. If a worker dies, unacked messages get retried.                                                                                         |
+| **Pusher (separate from API)** | The API handles user requests; the pusher is a background cron. Separating them means the API stays fast and the scheduler can run independently.                                                                                              |
+| **Worker (separate process)**  | HTTP checks are slow (network I/O). Running them in a dedicated process keeps the API responsive and lets you scale workers horizontally.                                                                                                      |
+| **Nginx (production only)**    | `vite build` outputs static HTML/CSS/JS. In production there's no Vite dev server — Nginx serves those files and handles SPA routing (all paths → `index.html` so React Router works). In development, Vite's dev server handles this instead. |
+| **Prisma**                     | Type-safe database access shared across API, worker, and pusher via the `packages/store` workspace package.                                                                                                                                    |
+| **Consumer groups**            | Let you run multiple workers across regions. Each worker in a group gets unique messages, enabling horizontal scaling without coordination.                                                                                                    |
 
 ## Features
 
@@ -82,16 +82,16 @@ Planned or partial: multi-region admin UX, outbound notifications (email/Slack),
 
 ## Tech stack
 
-| Layer | Choice |
-|--------|--------|
-| Monorepo | [Turborepo](https://turbo.build/), Bun workspaces |
-| API | Express 5, TypeScript, Zod, JWT |
-| Database | PostgreSQL, Prisma (`packages/store`) |
-| Frontend | React, Vite, Tailwind CSS, Recharts |
-| Queue | Redis Streams (`packages/redis-custom-client`) |
-| Tests | Bun test (`apps/tests`) |
-| Container | Docker, Docker Compose, Nginx |
-| Package manager | Bun (`packageManager` in root `package.json`) |
+| Layer           | Choice                                            |
+| --------------- | ------------------------------------------------- |
+| Monorepo        | [Turborepo](https://turbo.build/), Bun workspaces |
+| API             | Express 5, TypeScript, Zod, JWT                   |
+| Database        | PostgreSQL, Prisma (`packages/store`)             |
+| Frontend        | React, Vite, Tailwind CSS, Recharts               |
+| Queue           | Redis Streams (`packages/redis-custom-client`)    |
+| Tests           | Bun test (`apps/tests`)                           |
+| Container       | Docker, Docker Compose, Nginx                     |
+| Package manager | Bun (`packageManager` in root `package.json`)     |
 
 ## Project structure
 
@@ -136,6 +136,7 @@ docker compose up --build
 ```
 
 This starts PostgreSQL, Redis, runs migrations, and launches all services:
+
 - Frontend: `http://localhost`
 - API: `http://localhost:3000`
 
@@ -195,32 +196,32 @@ bun run index.ts
 
 All variables live in the **root `.env`** file. No sub-directory env files needed.
 
-| Variable | Used by | Purpose |
-|----------|---------|---------|
-| `DATABASE_URL` | API, Worker, Pusher | PostgreSQL connection string |
-| `REDIS_URL` | Worker, Pusher | Redis connection URL |
-| `STREAM_NAME` | Worker, Pusher | Redis stream key for check jobs |
-| `PORT` | API | HTTP port (default `3000`) |
-| `JWT_SECRET` | API | Secret for signing JWTs |
-| `FRONTEND_ORIGIN` | API | CORS origin (default `http://localhost:5173`) |
-| `REGION_ID` | Worker | Consumer group / region identifier |
-| `WORKER_ID` | Worker | Consumer name within the group |
-| `VITE_API_URL` | Frontend | API base URL (baked in at build time) |
-| `BACKEND_URL` | Tests | API URL for integration tests |
+| Variable          | Used by             | Purpose                                       |
+| ----------------- | ------------------- | --------------------------------------------- |
+| `DATABASE_URL`    | API, Worker, Pusher | PostgreSQL connection string                  |
+| `REDIS_URL`       | Worker, Pusher      | Redis connection URL                          |
+| `STREAM_NAME`     | Worker, Pusher      | Redis stream key for check jobs               |
+| `PORT`            | API                 | HTTP port (default `3000`)                    |
+| `JWT_SECRET`      | API                 | Secret for signing JWTs                       |
+| `FRONTEND_ORIGIN` | API                 | CORS origin (default `http://localhost:5173`) |
+| `REGION_ID`       | Worker              | Consumer group / region identifier            |
+| `WORKER_ID`       | Worker              | Consumer name within the group                |
+| `VITE_API_URL`    | Frontend            | API base URL (baked in at build time)         |
+| `BACKEND_URL`     | Tests               | API URL for integration tests                 |
 
 ## API endpoints
 
-| Method | Path | Auth | Description |
-|--------|------|------|-------------|
-| POST | `/api/v1/user/signup` | No | Create account |
-| POST | `/api/v1/user/signin` | No | Login, get JWT |
-| GET | `/api/v1/websites` | Yes | List user's websites + ticks |
-| POST | `/api/v1/websites/website` | Yes | Add URL to monitor |
-| GET | `/api/v1/websites/status/:id` | Yes | Single website + ticks |
-| DELETE | `/api/v1/websites/website/:id` | Yes | Remove monitoring |
-| GET | `/api/v1/regions` | No | List regions |
-| POST | `/api/v1/regions` | No | Create region |
-| DELETE | `/api/v1/regions/:id` | No | Delete region |
+| Method | Path                           | Auth | Description                  |
+| ------ | ------------------------------ | ---- | ---------------------------- |
+| POST   | `/api/v1/user/signup`          | No   | Create account               |
+| POST   | `/api/v1/user/signin`          | No   | Login, get JWT               |
+| GET    | `/api/v1/websites`             | Yes  | List user's websites + ticks |
+| POST   | `/api/v1/websites/website`     | Yes  | Add URL to monitor           |
+| GET    | `/api/v1/websites/status/:id`  | Yes  | Single website + ticks       |
+| DELETE | `/api/v1/websites/website/:id` | Yes  | Remove monitoring            |
+| GET    | `/api/v1/regions`              | No   | List regions                 |
+| POST   | `/api/v1/regions`              | No   | Create region                |
+| DELETE | `/api/v1/regions/:id`          | No   | Delete region                |
 
 ## Tests
 

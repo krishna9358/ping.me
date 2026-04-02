@@ -1,23 +1,23 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Header } from '../components/layout/Header';
-import { WebsiteTable } from '../components/dashboard/WebsiteTable';
-import { AnimatedSection } from '../components/ui/AnimatedSection';
-import { createWebsite, listWebsites } from '../lib/api';
-import { mapApiWebsiteToWebsite } from '../lib/mapWebsite';
-import type { Website } from '../types';
+import React, { useCallback, useEffect, useState } from "react";
+import { Header } from "../components/layout/Header";
+import { WebsiteTable } from "../components/dashboard/WebsiteTable";
+import { AnimatedSection } from "../components/ui/AnimatedSection";
+import { createWebsite, listWebsites } from "../lib/api";
+import { mapApiWebsiteToWebsite } from "../lib/mapWebsite";
+import type { Website } from "../types";
 
 export const Dashboard: React.FC = () => {
   const [websites, setWebsites] = useState<Website[]>([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState('');
+  const [loadError, setLoadError] = useState("");
 
   const loadWebsites = useCallback(async () => {
     try {
-      setLoadError('');
+      setLoadError("");
       const { websites: list } = await listWebsites();
       setWebsites(list.map((w) => mapApiWebsiteToWebsite(w)));
     } catch (e) {
-      setLoadError(e instanceof Error ? e.message : 'Failed to load websites');
+      setLoadError(e instanceof Error ? e.message : "Failed to load websites");
     } finally {
       setLoading(false);
     }
@@ -48,20 +48,23 @@ export const Dashboard: React.FC = () => {
           <p className="text-gray-400">Monitor and manage your websites</p>
         </AnimatedSection>
 
-        {loadError ? (
-          <p className="text-red-400 mb-4">{loadError}</p>
-        ) : null}
+        {loadError ? <p className="text-red-400 mb-4">{loadError}</p> : null}
 
         {loading ? (
           <p className="text-gray-400">Loading websites…</p>
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-              <AnimatedSection className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30" delay={0.0}>
+              <AnimatedSection
+                className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30"
+                delay={0.0}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400 mb-1">Total Websites</p>
-                    <p className="text-2xl font-bold text-white">{websites.length}</p>
+                    <p className="text-2xl font-bold text-white">
+                      {websites.length}
+                    </p>
                   </div>
                   <div className="w-12 h-12 bg-accent-500/20 rounded-lg flex items-center justify-center">
                     <div className="w-6 h-6 bg-accent-500 rounded" />
@@ -69,12 +72,15 @@ export const Dashboard: React.FC = () => {
                 </div>
               </AnimatedSection>
 
-              <AnimatedSection className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30" delay={0.05}>
+              <AnimatedSection
+                className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30"
+                delay={0.05}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400 mb-1">Online</p>
                     <p className="text-2xl font-bold text-green-400">
-                      {websites.filter(w => w.status === 'up').length}
+                      {websites.filter((w) => w.status === "up").length}
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
@@ -83,12 +89,15 @@ export const Dashboard: React.FC = () => {
                 </div>
               </AnimatedSection>
 
-              <AnimatedSection className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30" delay={0.1}>
+              <AnimatedSection
+                className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30"
+                delay={0.1}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400 mb-1">Offline</p>
                     <p className="text-2xl font-bold text-red-400">
-                      {websites.filter(w => w.status === 'down').length}
+                      {websites.filter((w) => w.status === "down").length}
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
@@ -97,12 +106,22 @@ export const Dashboard: React.FC = () => {
                 </div>
               </AnimatedSection>
 
-              <AnimatedSection className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30" delay={0.15}>
+              <AnimatedSection
+                className="bg-gray-800 rounded-xl p-6 border border-gray-700 transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30"
+                delay={0.15}
+              >
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-sm text-gray-400 mb-1">Avg. Uptime</p>
                     <p className="text-2xl font-bold text-white">
-                      {websites.length ? Math.round(websites.reduce((acc, w) => acc + w.uptime, 0) / websites.length * 10) / 10 : 0}%
+                      {websites.length
+                        ? Math.round(
+                            (websites.reduce((acc, w) => acc + w.uptime, 0) /
+                              websites.length) *
+                              10,
+                          ) / 10
+                        : 0}
+                      %
                     </p>
                   </div>
                   <div className="w-12 h-12 bg-accent-600/20 rounded-lg flex items-center justify-center">
@@ -113,7 +132,10 @@ export const Dashboard: React.FC = () => {
             </div>
 
             <AnimatedSection>
-              <WebsiteTable websites={websites} onDeleted={() => void loadWebsites()} />
+              <WebsiteTable
+                websites={websites}
+                onDeleted={() => void loadWebsites()}
+              />
             </AnimatedSection>
           </>
         )}

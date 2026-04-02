@@ -1,26 +1,26 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Lock, User } from '../components/icons';
-import { AuthLayout } from '../components/layout/AuthLayout';
-import { Card } from '@repo/ui/card';
-import { Button } from '@repo/ui/button';
-import { Input } from '../components/ui/Input';
-import { useAuth } from '../context/AuthContext';
-import { signIn, signUp } from '../lib/api';
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { Lock, User } from "../components/icons";
+import { AuthLayout } from "../components/layout/AuthLayout";
+import { Card } from "@repo/ui/card";
+import { Button } from "@repo/ui/button";
+import { Input } from "../components/ui/Input";
+import { useAuth } from "../context/AuthContext";
+import { signIn, signUp } from "../lib/api";
 
 export const Signup: React.FC = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const { setToken } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     try {
       await signUp({
@@ -32,9 +32,9 @@ export const Signup: React.FC = () => {
         password: formData.password,
       });
       setToken(session.jwt);
-      navigate('/dashboard', { replace: true });
+      navigate("/dashboard", { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not create account');
+      setError(err instanceof Error ? err.message : "Could not create account");
     } finally {
       setLoading(false);
     }
@@ -52,8 +52,12 @@ export const Signup: React.FC = () => {
       <Card className="">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-white text-center mb-2">Create your account</h2>
-            <p className="text-gray-400 text-center">Start monitoring your websites today</p>
+            <h2 className="text-2xl font-bold text-white text-center mb-2">
+              Create your account
+            </h2>
+            <p className="text-gray-400 text-center">
+              Start monitoring your websites today
+            </p>
           </div>
 
           {error ? (
@@ -102,7 +106,7 @@ export const Signup: React.FC = () => {
           <div className="text-center">
             <span className="text-gray-400">Already have an account? </span>
             <Link
-              to="/login" 
+              to="/login"
               className="text-accent-400 hover:text-accent-300 font-medium transition-colors"
             >
               Sign in

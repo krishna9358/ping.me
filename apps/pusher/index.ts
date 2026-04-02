@@ -1,21 +1,23 @@
-import prismaClient from 'store/client';
-import { xAddBulk } from 'redis-custom-client/client'; 
+import prismaClient from "store/client";
+import { xAddBulk } from "redis-custom-client/client";
 
-async function main(){
-    let websites = await prismaClient.website.findMany({
-        select:{
-        id:true,
-        url:true
-        }
-    })
-    console.log(websites.length);
-    await xAddBulk(websites.map(w=>({url:w.url, id:w.id})));
+async function main() {
+  let websites = await prismaClient.website.findMany({
+    select: {
+      id: true,
+      url: true,
+    },
+  });
+  console.log(websites.length);
+  await xAddBulk(websites.map((w) => ({ url: w.url, id: w.id })));
 }
 
-
 // every three mins to push to to the redis stream
-setInterval(()=>{
+setInterval(
+  () => {
     main();
-}, 3 * 1000 * 60)
+  },
+  3 * 1000 * 60,
+);
 
 main();

@@ -1,5 +1,5 @@
-import React, { Fragment } from 'react';
-import { Dialog, Transition } from '@headlessui/react';
+import React, { Fragment } from "react";
+import { Dialog, Transition } from "@headlessui/react";
 
 interface ModalProps {
   open: boolean;
@@ -7,14 +7,14 @@ interface ModalProps {
   title?: string;
   description?: string;
   children: React.ReactNode;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: "sm" | "md" | "lg" | "xl";
 }
 
-const sizeClasses: Record<NonNullable<ModalProps['size']>, string> = {
-  sm: 'sm:max-w-sm',
-  md: 'sm:max-w-md',
-  lg: 'sm:max-w-lg',
-  xl: 'sm:max-w-xl',
+const sizeClasses: Record<NonNullable<ModalProps["size"]>, string> = {
+  sm: "sm:max-w-sm",
+  md: "sm:max-w-md",
+  lg: "sm:max-w-lg",
+  xl: "sm:max-w-xl",
 };
 
 export const Modal: React.FC<ModalProps> = ({
@@ -23,7 +23,7 @@ export const Modal: React.FC<ModalProps> = ({
   title,
   description,
   children,
-  size = 'md',
+  size = "md",
 }) => {
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -77,5 +77,3 @@ export const Modal: React.FC<ModalProps> = ({
     </Transition.Root>
   );
 };
-
-

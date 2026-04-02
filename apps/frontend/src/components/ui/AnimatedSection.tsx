@@ -1,5 +1,5 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React from "react";
+import { motion } from "framer-motion";
 
 interface AnimatedSectionProps {
   children: React.ReactNode;
@@ -13,7 +13,7 @@ export const AnimatedSection: React.FC<AnimatedSectionProps> = ({
   children,
   delay = 0,
   yOffset = 12,
-  className = '',
+  className = "",
   once = true,
 }) => {
   return (
@@ -22,11 +22,9 @@ export const AnimatedSection: React.FC<AnimatedSectionProps> = ({
       initial={{ opacity: 0, y: yOffset }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once, amount: 0.2 }}
-      transition={{ duration: 0.4, ease: 'easeOut', delay }}
+      transition={{ duration: 0.4, ease: "easeOut", delay }}
     >
       {children}
     </motion.div>
   );
 };
-
-

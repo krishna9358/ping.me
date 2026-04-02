@@ -1,23 +1,29 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Activity, Plus, User, LogOut } from '../icons';
-import { CreateWebsiteModal } from '../dashboard/CreateWebsiteModal';
-import { Button } from '@repo/ui/button';
-import { useAuth } from '../../context/AuthContext';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Activity, Plus, User, LogOut } from "../icons";
+import { CreateWebsiteModal } from "../dashboard/CreateWebsiteModal";
+import { Button } from "@repo/ui/button";
+import { useAuth } from "../../context/AuthContext";
 
 interface HeaderProps {
   showCreateButton?: boolean;
-  onWebsiteCreated?: (data: { name: string; url: string }) => void | Promise<void>;
+  onWebsiteCreated?: (data: {
+    name: string;
+    url: string;
+  }) => void | Promise<void>;
 }
 
-export const Header: React.FC<HeaderProps> = ({ showCreateButton = true, onWebsiteCreated }) => {
+export const Header: React.FC<HeaderProps> = ({
+  showCreateButton = true,
+  onWebsiteCreated,
+}) => {
   const [createOpen, setCreateOpen] = useState(false);
   const navigate = useNavigate();
   const { logout } = useAuth();
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate("/login");
   };
 
   const handleCreateWebsite = () => setCreateOpen(true);
@@ -31,7 +37,7 @@ export const Header: React.FC<HeaderProps> = ({ showCreateButton = true, onWebsi
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <button
           type="button"
-          onClick={() => navigate('/dashboard')}
+          onClick={() => navigate("/dashboard")}
           className="flex items-center space-x-3 text-white hover:text-accent-400 transition-colors"
         >
           <div className="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center">
@@ -39,26 +45,26 @@ export const Header: React.FC<HeaderProps> = ({ showCreateButton = true, onWebsi
           </div>
           <span className="text-xl font-semibold tracking-tight">ping.me</span>
         </button>
-        
+
         <div className="flex items-center space-x-4">
           {showCreateButton && (
-            <Button 
-              variant="primary" 
-              icon={Plus} 
+            <Button
+              variant="primary"
+              icon={Plus}
               onClick={handleCreateWebsite}
               size="md"
             >
               Create Website
             </Button>
           )}
-          
+
           <div className="flex items-center space-x-2">
             <Button variant="ghost" size="sm" type="button">
               <User className="w-4 h-4" />
             </Button>
-            <Button 
-              variant="ghost" 
-              size="sm" 
+            <Button
+              variant="ghost"
+              size="sm"
               type="button"
               onClick={handleLogout}
               className="text-gray-400 hover:text-red-400"

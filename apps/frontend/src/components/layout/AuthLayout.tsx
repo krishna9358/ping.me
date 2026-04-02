@@ -1,5 +1,5 @@
-import React from 'react';
-import { Activity } from '../icons';
+import React from "react";
+import { Activity } from "../icons";
 
 interface AuthLayoutProps {
   children: React.ReactNode;
@@ -19,7 +19,9 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
             <Activity className="w-6 h-6 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white">ping.me</h1>
-          <p className="text-gray-300 mt-2">Monitor your websites with confidence</p>
+          <p className="text-gray-300 mt-2">
+            Monitor your websites with confidence
+          </p>
         </div>
         {children}
       </div>

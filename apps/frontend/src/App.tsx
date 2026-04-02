@@ -1,10 +1,15 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Login } from './pages/Login';
-import { Signup } from './pages/Signup';
-import { Dashboard } from './pages/Dashboard';
-import { WebsiteDetails } from './pages/WebsiteDetails';
-import { Assistant } from './components/ui/Assistant';
-import { GuestOnlyRoute, ProtectedRoute } from './components/AuthRoutes';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { Login } from "./pages/Login";
+import { Signup } from "./pages/Signup";
+import { Dashboard } from "./pages/Dashboard";
+import { WebsiteDetails } from "./pages/WebsiteDetails";
+import { Assistant } from "./components/ui/Assistant";
+import { GuestOnlyRoute, ProtectedRoute } from "./components/AuthRoutes";
 
 function App() {
   return (

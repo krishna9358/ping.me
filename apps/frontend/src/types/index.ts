@@ -2,7 +2,7 @@ export interface Website {
   id: string;
   name: string;
   url: string;
-  status: 'up' | 'down' | 'maintenance';
+  status: "up" | "down" | "maintenance";
   lastCheck: Date;
   uptime: number;
   responseTime: number;
@@ -11,7 +11,7 @@ export interface Website {
 
 export interface UptimeData {
   timestamp: Date;
-  status: 'up' | 'down';
+  status: "up" | "down";
   responseTime: number;
 }
 

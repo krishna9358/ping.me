@@ -1,31 +1,31 @@
-import React, { useState } from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Lock, User } from '../components/icons';
-import { AuthLayout } from '../components/layout/AuthLayout';
-import { Card } from '@repo/ui/card';
-import { Button } from '@repo/ui/button';
-import { Input } from '../components/ui/Input';
-import { useAuth } from '../context/AuthContext';
-import { signIn } from '../lib/api';
+import React, { useState } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Lock, User } from "../components/icons";
+import { AuthLayout } from "../components/layout/AuthLayout";
+import { Card } from "@repo/ui/card";
+import { Button } from "@repo/ui/button";
+import { Input } from "../components/ui/Input";
+import { useAuth } from "../context/AuthContext";
+import { signIn } from "../lib/api";
 
 export const Login: React.FC = () => {
   const [formData, setFormData] = useState({
-    username: '',
-    password: '',
+    username: "",
+    password: "",
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
   const { setToken } = useAuth();
 
   const from =
     (location.state as { from?: { pathname: string } } | null)?.from
-      ?.pathname ?? '/dashboard';
+      ?.pathname ?? "/dashboard";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
     try {
       const res = await signIn({
@@ -35,7 +35,7 @@ export const Login: React.FC = () => {
       setToken(res.jwt);
       navigate(from, { replace: true });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign in failed');
+      setError(err instanceof Error ? err.message : "Sign in failed");
     } finally {
       setLoading(false);
     }
@@ -53,8 +53,12 @@ export const Login: React.FC = () => {
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-white text-center mb-2">Welcome back</h2>
-            <p className="text-gray-400 text-center">Sign in to your account to continue</p>
+            <h2 className="text-2xl font-bold text-white text-center mb-2">
+              Welcome back
+            </h2>
+            <p className="text-gray-400 text-center">
+              Sign in to your account to continue
+            </p>
           </div>
 
           {error ? (
@@ -101,8 +105,8 @@ export const Login: React.FC = () => {
 
           <div className="text-center">
             <span className="text-gray-400">Don't have an account? </span>
-            <Link 
-              to="/signup" 
+            <Link
+              to="/signup"
               className="text-accent-400 hover:text-accent-300 font-medium transition-colors"
             >
               Sign up

@@ -12,6 +12,4 @@ export {
   Globe,
   CheckCircle2,
   XCircle,
-} from 'lucide-react';
-
-
+} from "lucide-react";

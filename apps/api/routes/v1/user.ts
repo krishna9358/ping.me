@@ -23,7 +23,9 @@ async function verifyPassword(
 userRouter.post("/signin", async (req, res) => {
   const data = AuthInput.safeParse(req.body);
   if (!data.success) {
-    res.status(400).json({ error: "Invalid Inputs", details: data.error.flatten() });
+    res
+      .status(400)
+      .json({ error: "Invalid Inputs", details: data.error.flatten() });
     return;
   }
   try {
@@ -47,7 +49,9 @@ userRouter.post("/signin", async (req, res) => {
     const token = jwt.sign({ sub: user.id }, process.env.JWT_SECRET!, {
       expiresIn: "1h",
     });
-    res.status(200).json({ message: "User Signed in", id: user.id, jwt: token });
+    res
+      .status(200)
+      .json({ message: "User Signed in", id: user.id, jwt: token });
   } catch (e) {
     res.status(403).json({ error: "User not found" });
   }
@@ -57,7 +61,9 @@ userRouter.post("/signin", async (req, res) => {
 userRouter.post("/signup", async (req, res) => {
   const data = AuthInput.safeParse(req.body);
   if (!data.success) {
-    res.status(400).json({ error: "Invalid Inputs", details: data.error.flatten() });
+    res
+      .status(400)
+      .json({ error: "Invalid Inputs", details: data.error.flatten() });
     return;
   }
   try {
