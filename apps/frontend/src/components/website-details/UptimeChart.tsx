@@ -1,12 +1,13 @@
 import React from "react";
 import {
-  LineChart,
-  Line,
+  BarChart,
+  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
+  Cell,
 } from "recharts";
 import { UptimeData } from "../../types";
 
@@ -29,14 +30,14 @@ export const UptimeChart: React.FC<UptimeChartProps> = ({ data }) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-gray-800 border border-gray-600 rounded-lg p-3 shadow-lg">
-          <p className="text-gray-300 text-sm mb-1">Time: {label}</p>
-          <p className="text-accent-400 font-medium">
+        <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+          <p className="text-muted-foreground text-sm mb-1">Time: {label}</p>
+          <p className="text-foreground font-medium">
             {data.isUp ? `${data.responseTime}ms` : "Offline"}
           </p>
           <div
             className={`w-2 h-2 rounded-full mt-1 ${
-              data.isUp ? "bg-green-400" : "bg-red-400"
+              data.isUp ? "bg-chart-1" : "bg-destructive"
             }`}
           />
         </div>
@@ -46,47 +47,43 @@ export const UptimeChart: React.FC<UptimeChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 animate-fade-in">
-      <h3 className="text-lg font-semibold text-white mb-4">
+    <div className="bg-card rounded-xl p-6 border border-border shadow-sm animate-fade-in">
+      <h3 className="text-lg font-semibold text-foreground mb-4">
         Response Time (24h)
       </h3>
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={chartData}>
+          <BarChart data={chartData}>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="#374151"
-              opacity={0.3}
+              stroke="var(--border)"
+              vertical={false}
+              opacity={0.5}
             />
             <XAxis
               dataKey="time"
-              stroke="#9CA3AF"
+              stroke="var(--muted-foreground)"
               fontSize={12}
               tickLine={false}
               axisLine={false}
             />
             <YAxis
-              stroke="#9CA3AF"
+              stroke="var(--muted-foreground)"
               fontSize={12}
               tickLine={false}
               axisLine={false}
               domain={[0, "dataMax"]}
             />
-            <Tooltip content={<CustomTooltip />} />
-            <Line
-              type="monotone"
-              dataKey="responseTime"
-              stroke="#00BFA5"
-              strokeWidth={2}
-              dot={{ fill: "#00BFA5", strokeWidth: 2, r: 3 }}
-              activeDot={{
-                r: 5,
-                stroke: "#00BFA5",
-                strokeWidth: 2,
-                fill: "#121212",
-              }}
-            />
-          </LineChart>
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: 'var(--muted)', opacity: 0.2 }} />
+            <Bar dataKey="responseTime" radius={[4, 4, 0, 0]} maxBarSize={40}>
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.isUp ? "var(--chart-1)" : "var(--destructive)"}
+                />
+              ))}
+            </Bar>
+          </BarChart>
         </ResponsiveContainer>
       </div>
     </div>

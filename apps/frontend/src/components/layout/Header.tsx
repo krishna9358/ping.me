@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { Activity, Plus, User, LogOut } from "../icons";
 import { CreateWebsiteModal } from "../dashboard/CreateWebsiteModal";
 import { Button } from "@repo/ui/button";
@@ -10,6 +10,7 @@ interface HeaderProps {
   onWebsiteCreated?: (data: {
     name: string;
     url: string;
+    region?: string;
   }) => void | Promise<void>;
 }
 
@@ -28,25 +29,32 @@ export const Header: React.FC<HeaderProps> = ({
 
   const handleCreateWebsite = () => setCreateOpen(true);
 
-  const handleCreated = async (data: { name: string; url: string }) => {
+  const handleCreated = async (data: { name: string; url: string; region?: string }) => {
     await onWebsiteCreated?.(data);
   };
 
   return (
-    <header className="bg-gray-800/80 backdrop-blur border-b border-gray-700 px-6 py-4 sticky top-0 z-40">
+    <header className="bg-background/80 backdrop-blur border-b border-border px-6 py-4 sticky top-0 z-40">
       <div className="flex items-center justify-between max-w-7xl mx-auto">
         <button
           type="button"
           onClick={() => navigate("/dashboard")}
-          className="flex items-center space-x-3 text-white hover:text-accent-400 transition-colors"
+          className="flex items-center space-x-3 text-foreground hover:text-primary transition-colors"
         >
-          <div className="w-8 h-8 bg-accent-500 rounded-lg flex items-center justify-center">
-            <Activity className="w-5 h-5 text-white" />
+          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+            <Activity className="w-5 h-5 text-primary-foreground" />
           </div>
           <span className="text-xl font-semibold tracking-tight">ping.me</span>
         </button>
 
         <div className="flex items-center space-x-4">
+          <Link
+            to="/architecture"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground hidden sm:block mr-2"
+          >
+            Architecture
+          </Link>
+        
           {showCreateButton && (
             <Button
               variant="primary"
@@ -67,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
               size="sm"
               type="button"
               onClick={handleLogout}
-              className="text-gray-400 hover:text-red-400"
+              className="text-muted-foreground hover:text-destructive"
             >
               <LogOut className="w-4 h-4" />
             </Button>
@@ -77,7 +85,7 @@ export const Header: React.FC<HeaderProps> = ({
       <CreateWebsiteModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        onCreate={handleCreated}
+        onCreate={handleCreated as any}
       />
     </header>
   );

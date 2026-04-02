@@ -53,16 +53,16 @@ export const Login: React.FC = () => {
       <Card>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-white text-center mb-2">
+            <h2 className="text-2xl font-bold text-foreground text-center mb-2">
               Welcome back
             </h2>
-            <p className="text-gray-400 text-center">
+            <p className="text-muted-foreground text-center">
               Sign in to your account to continue
             </p>
           </div>
 
           {error ? (
-            <p className="text-sm text-red-400 text-center bg-red-950/40 border border-red-800/60 rounded-lg py-2 px-3">
+            <p className="text-sm text-destructive text-center bg-destructive/10 border border-destructive/20 rounded-lg py-2 px-3">
               {error}
             </p>
           ) : null}
@@ -104,10 +104,10 @@ export const Login: React.FC = () => {
           </Button>
 
           <div className="text-center">
-            <span className="text-gray-400">Don't have an account? </span>
+            <span className="text-muted-foreground">Don't have an account? </span>
             <Link
               to="/signup"
-              className="text-accent-400 hover:text-accent-300 font-medium transition-colors"
+              className="text-primary hover:text-primary/80 font-medium transition-colors"
             >
               Sign up
             </Link>

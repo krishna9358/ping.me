@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import {
   ChevronLeft,
@@ -8,7 +8,7 @@ import {
 } from "../components/icons";
 import { Header } from "../components/layout/Header";
 import { UptimeChart } from "../components/website-details/UptimeChart";
-import { ScreenshotGrid } from "../components/website-details/ScreenshotGrid";
+import { UptimeTimeline } from "../components/website-details/UptimeTimeline";
 import { StatusPill } from "../components/ui/StatusPill";
 import { Button } from "@repo/ui/button";
 import { deleteWebsite, getWebsiteWithTicks } from "../lib/api";
@@ -23,36 +23,31 @@ export const WebsiteDetails: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!id) {
+  const fetchWebsiteData = useCallback(async () => {
+    if (!id) return;
+    try {
+      const { website } = await getWebsiteWithTicks(id);
+      setRaw(website);
+      setError("");
+    } catch {
+      setError("Could not load this website.");
+      setRaw(null);
+    } finally {
       setLoading(false);
-      return;
     }
-    let cancelled = false;
-    (async () => {
-      try {
-        const { website } = await getWebsiteWithTicks(id);
-        if (!cancelled) {
-          setRaw(website);
-          setError("");
-        }
-      } catch {
-        if (!cancelled) {
-          setError("Could not load this website.");
-          setRaw(null);
-        }
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
   }, [id]);
+
+  useEffect(() => {
+    fetchWebsiteData();
+    const interval = setInterval(() => {
+      fetchWebsiteData();
+    }, 15000); // 15 seconds refresh
+    return () => clearInterval(interval);
+  }, [fetchWebsiteData]);
 
   const website = useMemo(
     () => (raw ? mapApiWebsiteToWebsite(raw) : null),
-    [raw],
+    [raw]
   );
 
   const uptimeData: UptimeData[] = useMemo(() => {
@@ -68,7 +63,7 @@ export const WebsiteDetails: React.FC = () => {
     if (!website) return;
     if (
       !window.confirm(
-        `Are you sure you want to remove monitoring for "${website.name}"?`,
+        `Are you sure you want to remove monitoring for "${website.name}"?`
       )
     ) {
       return;
@@ -81,24 +76,24 @@ export const WebsiteDetails: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading && !raw) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
-        <p className="text-gray-400">Loading…</p>
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <p className="text-muted-foreground">Loading…</p>
       </div>
     );
   }
 
   if (error || !website) {
     return (
-      <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-white mb-4">
+          <h1 className="text-2xl font-bold text-foreground mb-4">
             Website not found
           </h1>
           <Link
             to="/dashboard"
-            className="text-accent-400 hover:text-accent-300"
+            className="text-primary hover:text-primary-foreground transition-colors"
           >
             ← Back to Dashboard
           </Link>
@@ -108,14 +103,14 @@ export const WebsiteDetails: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-dark-900">
+    <div className="min-h-screen bg-background relative selection:bg-primary/30">
       <Header showCreateButton={false} />
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-8 relative">
         <div className="mb-6 animate-slide-up">
           <Link
             to="/dashboard"
-            className="inline-flex items-center text-gray-400 hover:text-accent-400 transition-colors mb-4"
+            className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors mb-4"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
             Back to Dashboard
@@ -124,17 +119,17 @@ export const WebsiteDetails: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-white mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               {website.name}
             </h1>
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
-                <span className="text-gray-400">{website.url}</span>
+                <span className="text-muted-foreground">{website.url}</span>
                 <a
                   href={website.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-gray-400 hover:text-accent-400 transition-colors"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" />
                 </a>
@@ -160,26 +155,26 @@ export const WebsiteDetails: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <p className="text-sm text-gray-400 mb-1">Current Status</p>
+          <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
+            <p className="text-sm text-muted-foreground mb-1">Current Status</p>
             <StatusPill status={website.status} />
           </div>
 
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <p className="text-sm text-gray-400 mb-1">Uptime</p>
-            <p className="text-2xl font-bold text-white">{website.uptime}%</p>
+          <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
+            <p className="text-sm text-muted-foreground mb-1">Uptime</p>
+            <p className="text-2xl font-bold text-card-foreground">{website.uptime}%</p>
           </div>
 
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <p className="text-sm text-gray-400 mb-1">Response Time</p>
-            <p className="text-2xl font-bold text-white">
+          <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
+            <p className="text-sm text-muted-foreground mb-1">Response Time</p>
+            <p className="text-2xl font-bold text-card-foreground">
               {website.status === "down" ? "—" : `${website.responseTime}ms`}
             </p>
           </div>
 
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <p className="text-sm text-gray-400 mb-1">Monitoring Since</p>
-            <p className="text-2xl font-bold text-white">
+          <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
+            <p className="text-sm text-muted-foreground mb-1">Monitoring Since</p>
+            <p className="text-2xl font-bold text-card-foreground">
               {website.createdAt.toLocaleDateString("en-US", {
                 month: "short",
                 day: "numeric",
@@ -188,11 +183,10 @@ export const WebsiteDetails: React.FC = () => {
           </div>
         </div>
 
-        <div className="mb-8">
+        <div className="mb-0">
+          <UptimeTimeline data={uptimeData} title="30-Second Checks" totalTicks={90} />
           <UptimeChart data={uptimeData} />
         </div>
-
-        <ScreenshotGrid screenshots={[]} />
       </main>
     </div>
   );

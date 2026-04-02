@@ -12,4 +12,6 @@ export {
   Globe,
   CheckCircle2,
   XCircle,
+  Clock,
+  Server
 } from "lucide-react";
