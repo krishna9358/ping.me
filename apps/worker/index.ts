@@ -47,13 +47,18 @@ async function main() {
 
   while (true) {
     const response = await xReadGroup(REGION_ID!, WORKER_ID!);
-    if (!response) {
+    if (!response || response.length === 0) {
+      continue;
+    }
+
+    const messages = response[0].messages;
+    if (!messages || messages.length === 0) {
       continue;
     }
 
     // Check all websites in parallel
     const results = await Promise.all(
-      response.map(({ message }: any) => checkWebsite(message.url, message.id)),
+      messages.map(({ message }: any) => checkWebsite(message.url, message.id)),
     );
 
     // Bulk insert all ticks in a single DB call
@@ -63,7 +68,7 @@ async function main() {
     // Acknowledge all events
     await xAckBulk(
       REGION_ID!,
-      response.map(({ id }: any) => id),
+      messages.map(({ id }: any) => id),
     );
   }
 }
