@@ -8,15 +8,16 @@ import { Login } from "./pages/Login";
 import { Signup } from "./pages/Signup";
 import { Dashboard } from "./pages/Dashboard";
 import { WebsiteDetails } from "./pages/WebsiteDetails";
-import { Assistant } from "./components/ui/Assistant";
+import { Architecture } from "./pages/Architecture";
+import { Landing } from "./pages/Landing";
 import { GuestOnlyRoute, ProtectedRoute } from "./components/AuthRoutes";
 
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-dark-900">
+      <div className="min-h-screen bg-background dark text-foreground">
         <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
+          <Route path="/" element={<Landing />} />
           <Route
             path="/login"
             element={
@@ -49,8 +50,11 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/architecture"
+            element={<Architecture />}
+          />
         </Routes>
-        <Assistant />
       </div>
     </Router>
   );

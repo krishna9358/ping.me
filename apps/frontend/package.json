@@ -10,14 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@repo/ui": "*",
     "@headlessui/react": "^2.2.7",
+    "@repo/ui": "*",
     "@types/react-router-dom": "^5.3.3",
     "framer-motion": "^12.23.12",
     "lucide-react": "^0.344.0",
+    "mermaid": "^11.14.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.8.0",
+    "react-zoom-pan-pinch": "^3.7.0",
     "recharts": "^3.1.2"
   },
   "devDependencies": {
