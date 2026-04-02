@@ -22,16 +22,16 @@ export const Button: React.FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-dark-900 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]";
+    "inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98]";
 
   const variants = {
     primary:
-      "bg-accent-600 hover:bg-accent-700 text-white focus:ring-accent-500 shadow-lg shadow-accent-500/20",
+      "bg-primary hover:bg-primary/90 text-primary-foreground focus:ring-ring shadow-lg shadow-primary/20",
     secondary:
-      "bg-gray-700 hover:bg-gray-600 text-gray-100 focus:ring-accent-500/40 border border-gray-600",
+      "bg-secondary hover:bg-secondary/80 text-secondary-foreground focus:ring-ring/40 border border-border",
     ghost:
-      "text-gray-300 hover:text-white hover:bg-gray-800 focus:ring-accent-500/40",
-    danger: "bg-red-600 hover:bg-red-700 text-white focus:ring-red-500",
+      "text-muted-foreground hover:text-foreground hover:bg-accent focus:ring-ring/40",
+    danger: "bg-destructive hover:bg-destructive/90 text-destructive-foreground focus:ring-destructive",
   };
 
   const sizes = {
@@ -60,7 +60,7 @@ export const Button: React.FC<ButtonProps> = ({
     >
       {loading ? (
         <>
-          <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+          <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin mr-2" />
           Loading...
         </>
       ) : (

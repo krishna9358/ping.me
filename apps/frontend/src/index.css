@@ -2,54 +2,130 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  box-sizing: border-box;
+@layer base {
+  :root {
+    --background: #fdfdfd;
+    --foreground: #000000;
+    --card: #fdfdfd;
+    --card-foreground: #000000;
+    --popover: #fcfcfc;
+    --popover-foreground: #000000;
+    --primary: #7033ff;
+    --primary-foreground: #ffffff;
+    --secondary: #edf0f4;
+    --secondary-foreground: #080808;
+    --muted: #f5f5f5;
+    --muted-foreground: #525252;
+    --accent: #e2ebff;
+    --accent-foreground: #1e69dc;
+    --destructive: #e54b4f;
+    --destructive-foreground: #ffffff;
+    --border: #e7e7ee;
+    --input: #ebebeb;
+    --ring: #000000;
+    --chart-1: #4ac885;
+    --chart-2: #7033ff;
+    --chart-3: #fd822b;
+    --chart-4: #3276e4;
+    --chart-5: #747474;
+    --sidebar: #f5f8fb;
+    --sidebar-foreground: #000000;
+    --sidebar-primary: #000000;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #ebebeb;
+    --sidebar-accent-foreground: #000000;
+    --sidebar-border: #ebebeb;
+    --sidebar-ring: #000000;
+    --font-sans: Plus Jakarta Sans, sans-serif;
+    --font-serif: Lora, serif;
+    --font-mono: IBM Plex Mono, monospace;
+    --radius: 1.4rem;
+    --shadow-x: 0px;
+    --shadow-y: 2px;
+    --shadow-blur: 3px;
+    --shadow-spread: 0px;
+    --shadow-opacity: 0.16;
+    --shadow-color: hsl(0 0% 0%);
+    --shadow-2xs: 0px 2px 3px 0px hsl(0 0% 0% / 0.08);
+    --shadow-xs: 0px 2px 3px 0px hsl(0 0% 0% / 0.08);
+    --shadow-sm: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 1px 2px -1px hsl(0 0% 0% / 0.16);
+    --shadow: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 1px 2px -1px hsl(0 0% 0% / 0.16);
+    --shadow-md: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 2px 4px -1px hsl(0 0% 0% / 0.16);
+    --shadow-lg: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 4px 6px -1px hsl(0 0% 0% / 0.16);
+    --shadow-xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.16), 0px 8px 10px -1px hsl(0 0% 0% / 0.16);
+    --shadow-2xl: 0px 2px 3px 0px hsl(0 0% 0% / 0.40);
+    --tracking-normal: -0.025em;
+    --spacing: 0.27rem;
+  }
+
+  .dark {
+    --background: #1a1b1e;
+    --foreground: #f0f0f0;
+    --card: #222327;
+    --card-foreground: #f0f0f0;
+    --popover: #222327;
+    --popover-foreground: #f0f0f0;
+    --primary: #8c5cff;
+    --primary-foreground: #ffffff;
+    --secondary: #2a2c33;
+    --secondary-foreground: #f0f0f0;
+    --muted: #2a2c33;
+    --muted-foreground: #a0a0a0;
+    --accent: #1e293b;
+    --accent-foreground: #79c0ff;
+    --destructive: #f87171;
+    --destructive-foreground: #ffffff;
+    --border: #33353a;
+    --input: #33353a;
+    --ring: #8c5cff;
+    --chart-1: #4ade80;
+    --chart-2: #8c5cff;
+    --chart-3: #fca5a5;
+    --chart-4: #5993f4;
+    --chart-5: #a0a0a0;
+    --sidebar: #161618;
+    --sidebar-foreground: #f0f0f0;
+    --sidebar-primary: #8c5cff;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #2a2c33;
+    --sidebar-accent-foreground: #8c5cff;
+    --sidebar-border: #33353a;
+    --sidebar-ring: #8c5cff;
+  }
 }
 
-body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #121212;
-  color: #E0E0E0;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+    letter-spacing: var(--tracking-normal);
+  }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  background: #1a1a1a;
+  background: transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  background: #404040;
+  background: var(--border);
   border-radius: 4px;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  background: #505050;
+  background: var(--muted-foreground);
 }
 
 /* Focus styles */
 input:focus {
   outline: none;
-  border-color: #00BFA5;
-  box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.1);
+  border-color: var(--ring);
+  box-shadow: 0 0 0 3px rgba(112, 51, 255, 0.1);
 }
-
 button:focus {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 191, 165, 0.3);
-}
-
-/* Dotted grid background utility */
-.bg-grid-dots {
-  background-image: radial-gradient(rgba(148, 163, 184, 0.35) 1px, transparent 0);
-  background-size: 20px 20px;
-  background-position: -10px -10px;
+  box-shadow: 0 0 0 3px rgba(112, 51, 255, 0.3);
 }

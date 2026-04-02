@@ -18,9 +18,9 @@ export const StatusPill: React.FC<StatusPillProps> = ({
   };
 
   const variants = {
-    up: "bg-green-500/20 text-green-400 border border-green-500/30",
-    down: "bg-red-500/20 text-red-400 border border-red-500/30",
-    maintenance: "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30",
+    up: "bg-chart-1/20 text-chart-1 border border-chart-1/30",
+    down: "bg-destructive/10 text-destructive border border-destructive/20",
+    maintenance: "bg-chart-3/20 text-chart-3 border border-chart-3/30",
   };
 
   const statusText = {
@@ -34,10 +34,10 @@ export const StatusPill: React.FC<StatusPillProps> = ({
       <div
         className={`w-2 h-2 rounded-full mr-2 ${
           status === "up"
-            ? "bg-green-400"
+            ? "bg-chart-1"
             : status === "down"
-              ? "bg-red-400"
-              : "bg-yellow-400"
+              ? "bg-destructive"
+              : "bg-chart-3"
         }`}
       />
       {statusText[status]}

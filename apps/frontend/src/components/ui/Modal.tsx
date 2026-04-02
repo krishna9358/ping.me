@@ -52,17 +52,17 @@ export const Modal: React.FC<ModalProps> = ({
               leaveTo="opacity-0 translate-y-2 scale-95"
             >
               <Dialog.Panel
-                className={`w-full ${sizeClasses[size]} transform overflow-hidden rounded-xl bg-gray-800 border border-gray-700 p-6 text-left align-middle shadow-xl`}
+                className={`w-full ${sizeClasses[size]} transform overflow-hidden rounded-xl bg-popover border border-border p-6 text-left align-middle shadow-xl`}
               >
                 {(title || description) && (
                   <div className="mb-4">
                     {title && (
-                      <Dialog.Title className="text-lg font-semibold text-white">
+                      <Dialog.Title className="text-lg font-semibold text-foreground">
                         {title}
                       </Dialog.Title>
                     )}
                     {description && (
-                      <Dialog.Description className="mt-1 text-sm text-gray-400">
+                      <Dialog.Description className="mt-1 text-sm text-muted-foreground">
                         {description}
                       </Dialog.Description>
                     )}
