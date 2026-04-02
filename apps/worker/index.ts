@@ -21,6 +21,7 @@ interface TickResult {
 async function checkWebsite(
   url: string,
   websiteId: string,
+  regionId: string,
 ): Promise<TickResult> {
   const startTime = Date.now();
   try {
@@ -28,14 +29,14 @@ async function checkWebsite(
     return {
       response_time_ms: Date.now() - startTime,
       websiteId,
-      regionId: REGION_ID!,
+      regionId,
       status: "Up",
     };
   } catch {
     return {
       response_time_ms: Date.now() - startTime,
       websiteId,
-      regionId: REGION_ID!,
+      regionId,
       status: "Down",
     };
   }
@@ -58,7 +59,7 @@ async function main() {
 
     // Check all websites in parallel
     const results = await Promise.all(
-      messages.map(({ message }: any) => checkWebsite(message.url, message.id)),
+      messages.map(({ message }: any) => checkWebsite(message.url, message.id, message.regionId)),
     );
 
     // Bulk insert all ticks in a single DB call

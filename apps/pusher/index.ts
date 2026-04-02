@@ -6,18 +6,19 @@ async function main() {
     select: {
       id: true,
       url: true,
+      regionId: true,
     },
   });
   console.log(websites.length);
-  await xAddBulk(websites.map((w) => ({ url: w.url, id: w.id })));
+  await xAddBulk(websites.map((w) => ({ url: w.url, id: w.id, regionId: w.regionId })));
 }
 
-// every three mins to push to to the redis stream
+// every 30 seconds to push to the redis stream
 setInterval(
   () => {
     main();
   },
-  3 * 1000 * 60,
+  30 * 1000,
 );
 
 main();

@@ -15,13 +15,14 @@ const client = await createClient({
   .on("error", (err) => console.log("Redis Client Error", err))
   .connect();
 
-type WebsiteEvent = { url: string; id: string };
+type WebsiteEvent = { url: string; id: string; regionId: string };
 
 // Adds a single website to the stream
-export async function xAdd({ url, id }: WebsiteEvent) {
+export async function xAdd({ url, id, regionId }: WebsiteEvent) {
   await client.xAdd(STREAM_NAME, "*", {
     url,
     id,
+    regionId,
   });
 }
 
@@ -30,7 +31,7 @@ export async function xAddBulk(websites: WebsiteEvent[]) {
   if (websites.length === 0) return;
   const pipeline = client.multi();
   for (const w of websites) {
-    pipeline.xAdd(STREAM_NAME, "*", { url: w.url, id: w.id });
+    pipeline.xAdd(STREAM_NAME, "*", { url: w.url, id: w.id, regionId: w.regionId });
   }
   await pipeline.exec();
 }
