@@ -3,10 +3,25 @@ import v1Router from "./routes/v1";
 
 const app = express();
 
-const frontendOrigin = process.env.FRONTEND_ORIGIN ?? "http://localhost:5173";
+const defaultOrigins = "http://localhost:5173,http://localhost,http://127.0.0.1";
+const allowedOrigins = (process.env.FRONTEND_ORIGIN ?? defaultOrigins)
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+function corsAllowOrigin(req: express.Request): string | undefined {
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    return origin;
+  }
+  return allowedOrigins[0];
+}
 
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", frontendOrigin);
+  const allow = corsAllowOrigin(req);
+  if (allow) {
+    res.setHeader("Access-Control-Allow-Origin", allow);
+  }
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Methods", "GET,POST,DELETE,OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");

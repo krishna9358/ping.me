@@ -106,17 +106,22 @@ websitesRouter.delete(
   "/website/:websiteId",
   authMiddleware,
   async (req, res) => {
-    const deleted = await prismaClient.website.deleteMany({
-      where: {
-        id: req.params.websiteId,
-        userId: req.userId!,
-      },
-    });
-    if (deleted.count === 0) {
-      res.status(404).json({ error: "website not found" });
-      return;
+    const websiteId = req.params.websiteId;
+    const userId = req.userId!;
+    try {
+      // WebsiteTick rows are removed by ON DELETE CASCADE (see prisma migration).
+      const deleted = await prismaClient.website.deleteMany({
+        where: { id: websiteId, userId },
+      });
+      if (deleted.count === 0) {
+        res.status(404).json({ error: "website not found" });
+        return;
+      }
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting website:", error);
+      res.status(500).json({ error: "Failed to delete website" });
     }
-    res.status(204).send();
   },
 );
 
