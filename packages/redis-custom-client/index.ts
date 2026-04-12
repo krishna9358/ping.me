@@ -60,10 +60,12 @@ export async function xReadGroup(
     workerId,
     {
       key: STREAM_NAME,
-      id: ">", // reads from the last id it read automatically
+      id: ">", // new messages for this consumer group
     },
     {
-      COUNT: 5,
+      COUNT: 20,
+      // Avoid a tight loop when the stream is idle (saves CPU in Docker).
+      BLOCK: 5000,
     },
   );
   return result;
