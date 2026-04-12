@@ -30,7 +30,8 @@ export function mapApiWebsiteToWebsite(
     ? Math.round((upCount / ticks.length) * 1000) / 10
     : 100;
 
-  let status: Website["status"] = "maintenance";
+  let status: Website["status"] =
+    ticks.length === 0 ? "pending" : "maintenance";
   if (latest?.status === "Up") status = "up";
   else if (latest?.status === "Down") status = "down";
   else if (latest?.status === "Unknown") status = "maintenance";

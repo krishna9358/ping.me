@@ -34,7 +34,11 @@ export const Dashboard: React.FC = () => {
 
   const handleWebsiteCreated = async (data: { name: string; url: string; region?: string }) => {
     await createWebsite(data.url);
-    await loadWebsites();
+    try {
+      await loadWebsites();
+    } catch {
+      // Create succeeded; the 15s poll will refresh if this transiently fails.
+    }
   };
 
   return (

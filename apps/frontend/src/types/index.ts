@@ -2,7 +2,7 @@ export interface Website {
   id: string;
   name: string;
   url: string;
-  status: "up" | "down" | "maintenance";
+  status: "up" | "down" | "maintenance" | "pending";
   lastCheck: Date;
   uptime: number;
   responseTime: number;

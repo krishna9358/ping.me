@@ -21,12 +21,15 @@ export const StatusPill: React.FC<StatusPillProps> = ({
     up: "bg-chart-1/20 text-chart-1 border border-chart-1/30",
     down: "bg-destructive/10 text-destructive border border-destructive/20",
     maintenance: "bg-chart-3/20 text-chart-3 border border-chart-3/30",
+    pending:
+      "bg-muted/40 text-muted-foreground border border-border",
   };
 
   const statusText = {
     up: "Online",
     down: "Offline",
     maintenance: "Maintenance",
+    pending: "Awaiting checks",
   };
 
   return (
@@ -37,7 +40,9 @@ export const StatusPill: React.FC<StatusPillProps> = ({
             ? "bg-chart-1"
             : status === "down"
               ? "bg-destructive"
-              : "bg-chart-3"
+              : status === "pending"
+                ? "bg-muted-foreground"
+                : "bg-chart-3"
         }`}
       />
       {statusText[status]}

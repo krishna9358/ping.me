@@ -114,7 +114,7 @@ export const WebsiteTable: React.FC<WebsiteTableProps> = ({
                 </td>
                 <td className="py-4 px-6">
                   <span className="text-sm text-foreground">
-                    {website.status === "down"
+                    {website.status === "down" || website.status === "pending"
                       ? "—"
                       : `${website.responseTime}ms`}
                   </span>

@@ -168,7 +168,9 @@ export const WebsiteDetails: React.FC = () => {
           <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
             <p className="text-sm text-muted-foreground mb-1">Response Time</p>
             <p className="text-2xl font-bold text-card-foreground">
-              {website.status === "down" ? "—" : `${website.responseTime}ms`}
+              {website.status === "down" || website.status === "pending"
+                ? "—"
+                : `${website.responseTime}ms`}
             </p>
           </div>
 

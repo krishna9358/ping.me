@@ -14,18 +14,20 @@ export const UptimeTimeline: React.FC<UptimeTimelineProps> = ({
 }) => {
   // Sort data ascending (oldest first)
   const sortedData = [...data].sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
-  
+  const latest = sortedData.length > 0 ? sortedData[sortedData.length - 1] : null;
+
   // Get last 90 ticks or pad with empty strings if less
   let timeline = sortedData.slice(-totalTicks);
   const paddingCount = totalTicks - timeline.length;
-  
+
   // Pad the beginning with nulls if we don't have enough data
   const paddedTimeline = [
     ...Array(paddingCount).fill(null),
-    ...timeline
+    ...timeline,
   ];
 
-  const overallStatus = data.length > 0 && data[0].status === "up" ? "Operational" : "Degraded";
+  const overallStatus =
+    !latest ? "No data" : latest.status === "up" ? "Operational" : "Degraded";
 
   return (
     <div className="bg-[#09090b] rounded-xl p-6 border border-[#27272a] shadow-sm font-sans mb-8">
@@ -33,7 +35,15 @@ export const UptimeTimeline: React.FC<UptimeTimelineProps> = ({
         <h3 className="text-sm font-semibold text-white flex items-center">
           <span className="text-gray-500 mr-2">&rsaquo;</span> {title}
         </h3>
-        <span className={`text-sm ${overallStatus === "Operational" ? "text-blue-500" : "text-red-500"}`}>
+        <span
+          className={`text-sm ${
+            overallStatus === "Operational"
+              ? "text-blue-500"
+              : overallStatus === "No data"
+                ? "text-muted-foreground"
+                : "text-red-500"
+          }`}
+        >
           {overallStatus}
         </span>
       </div>
